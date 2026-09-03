@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BISure — Indian Standards Assistant</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="chat-app" role="main">
+    <header class="chat-header">
+      <div class="brand-group">
+        <!-- Geometric Hexagonal Certification Stamp Icon -->
+        <svg class="brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <polygon points="12 2 21 7 21 17 12 22 3 17 3 7 12 2"></polygon>
+          <polyline points="8 12 11 15 16 9"></polyline>
+        </svg>
+        <div class="brand-text">
+          <h1 class="brand-title"><span class="brand-bold">BIS</span>ure</h1>
+          <span class="brand-divider" aria-hidden="true">/</span>
+          <span class="brand-tag">Standards &amp; Certification</span>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <div id="connection-status" class="status-indicator" role="status" title="Checking the local BISure service">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span class="status-label">Checking service</span>
+        </div>
+
+        <button id="theme-toggle" class="theme-toggle-btn" type="button" aria-label="Switch color theme" title="Toggle theme">
+          <svg class="theme-icon sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="theme-icon moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <section id="message-list" class="message-list" aria-live="polite" aria-label="Conversation thread">
+      <!-- Domain-Specific Empty State -->
+      <div id="empty-state" class="empty-state">
+        <div class="empty-hero">
+          <div class="hero-stamp" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <polygon points="12 2 21 7 21 17 12 22 3 17 3 7 12 2"></polygon>
+              <polyline points="9 12 11 14 15 10"></polyline>
+            </svg>
+          </div>
+          <h2 class="hero-heading">Ask about Indian Standards &amp; Certification</h2>
+          <p class="hero-subtext">
+            Verify mandatory QCO orders, hallmarking requirements, ISI conformity, and consumer certification lookup.
+          </p>
+        </div>
+
+        <div class="category-grid" aria-label="Sample questions">
+          <button type="button" class="category-card" data-prompt="What are the mandatory gold hallmarking rules, carats covered, and how to verify a 6-digit HUID?">
+            <div class="card-icon card-icon-gold">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <circle cx="12" cy="12" r="7"></circle>
+                <polyline points="12 9 12 12 13.5 13.5"></polyline>
+                <path d="M16.51 17.35l-.35 3.83a2 2 0 0 1-2 1.82H9.83a2 2 0 0 1-2-1.82l-.35-3.83m.01-10.7l.35-3.83A2 2 0 0 1 9.83 1h4.35a2 2 0 0 1 2 1.82l.35 3.83"></path>
+              </svg>
+            </div>
+            <div class="card-text">
+              <span class="card-title">Gold Hallmarking &amp; HUID</span>
+              <span class="card-desc">14k, 18k, 22k purity rules and BIS CARE verification.</span>
+            </div>
+          </button>
+
+          <button type="button" class="category-card" data-prompt="Which consumer and industrial products fall under mandatory ISI certification under QCOs?">
+            <div class="card-icon card-icon-navy">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+              </svg>
+            </div>
+            <div class="card-text">
+              <span class="card-title">Mandatory ISI / QCOs</span>
+              <span class="card-desc">Toys, pressure cookers, cement, cylinders, and helmets.</span>
+            </div>
+          </button>
+
+          <button type="button" class="category-card" data-prompt="What is the difference between the ISI mark scheme and the Compulsory Registration Scheme (CRS) for electronics?">
+            <div class="card-icon card-icon-slate">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+                <line x1="9" y1="9" x2="15" y2="15"></line>
+                <line x1="15" y1="9" x2="9" y2="15"></line>
+              </svg>
+            </div>
+            <div class="card-text">
+              <span class="card-title">CRS vs. ISI Scheme</span>
+              <span class="card-desc">Factory audit models vs. IT &amp; electronics registration.</span>
+            </div>
+          </button>
+
+          <button type="button" class="category-card" data-prompt="How can a consumer check if a manufacturer's CML number on an ISI mark is authentic?">
+            <div class="card-icon card-icon-teal">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+            </div>
+            <div class="card-text">
+              <span class="card-title">License Authentication</span>
+              <span class="card-desc">Checking 7-digit CML license validity and filing complaints.</span>
+            </div>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <div class="input-container">
+      <form id="chat-form" class="chat-form" autocomplete="off">
+        <label for="user-input" class="visually-hidden">Question for BIS Assistant</label>
+        <div class="input-wrapper">
+          <textarea
+            id="user-input"
+            name="query"
+            placeholder="Ask about BIS standards, hallmarking rules, or certification..."
+            required
+            rows="1"
+            aria-describedby="input-hint"
+          ></textarea>
+          <button id="send-button" type="submit" aria-label="Send query">
+            <svg class="send-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+            <svg class="spinner-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true" hidden>
+              <circle cx="12" cy="12" r="9" stroke-opacity="0.25"></circle>
+              <path d="M12 3a9 9 0 0 1 9 9" stroke-linecap="round"></path>
+            </svg>
+          </button>
+        </div>
+        <p id="input-hint" class="input-hint">Press <kbd>Enter</kbd> to submit, <kbd>Shift + Enter</kbd> for a new line</p>
+      </form>
+    </div>
+  </main>
+
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
