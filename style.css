@@ -864,6 +864,18 @@ html, body {
   cursor: not-allowed;
 }
 
+.app-footer {
+  margin-top: var(--space-2);
+  text-align: center;
+}
+
+.copyright-text {
+  margin: 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-subtle);
+  user-select: none;
+}
+
 /* Send Button: Dedicated Hallmarking Gold/Amber Accent */
 #send-button {
   display: flex;
