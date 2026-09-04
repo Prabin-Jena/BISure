@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How It Works — BISure Standards Assistant</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- ================= STICKY TOP NAV ================= -->
+  <header class="site-header" role="banner">
+    <div class="nav-container">
+      <a href="index.html" class="brand-group" aria-label="BISure Home">
+        <svg class="brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <polygon points="12 2 21 7 21 17 12 22 3 17 3 7 12 2"></polygon>
+          <polyline points="8 12 11 15 16 9"></polyline>
+        </svg>
+        <div class="brand-text">
+          <span class="brand-title"><span class="brand-bold">BIS</span>ure</span>
+          <span class="brand-divider" aria-hidden="true">/</span>
+          <span class="brand-tag">Standards Assistant</span>
+        </div>
+      </a>
+
+      <nav id="primary-nav" class="nav-links" aria-label="Main Navigation">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="features.html" class="nav-link">Features</a>
+        <a href="how-it-works.html" class="nav-link nav-active" aria-current="page">How It Works</a>
+        <a href="chat.html" class="nav-link nav-link-highlight">Assistant</a>
+        <a href="about.html" class="nav-link">About</a>
+      </nav>
+
+      <div class="header-controls">
+        <div id="connection-status" class="status-indicator" role="status" title="Checking BISure backend service">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span class="status-label">Checking service</span>
+        </div>
+
+        <button id="theme-toggle" class="theme-toggle-btn" type="button" aria-label="Switch color theme" title="Toggle theme">
+          <svg class="theme-icon sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+          <svg class="theme-icon moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+
+        <button id="nav-toggle" class="nav-toggle-btn" type="button" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="primary-nav">
+          <span class="hamburger-bar"></span>
+          <span class="hamburger-bar"></span>
+          <span class="hamburger-bar"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ================= HOW IT WORKS ================= -->
+    <section id="how-it-works" class="how-it-works-section" aria-labelledby="how-heading">
+      <div class="section-container">
+        <div class="section-header">
+          <span class="section-eyebrow">Architecture &amp; Trust</span>
+          <h2 id="how-heading" class="section-title">How BISure Works</h2>
+          <p class="section-subtext">
+            Strict Retrieval-Augmented Generation (RAG) designed to give you verifiable ground truth, not probabilistic hallucinations.
+          </p>
+        </div>
+
+        <div class="steps-grid">
+          <div class="step-card">
+            <div class="step-badge">01</div>
+            <div class="step-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </div>
+            <h3 class="step-title">1. Ask a question</h3>
+            <p class="step-desc">
+              Ask any natural language query on BIS standards, mandatory QCOs, hallmarking rules, or certification procedures.
+            </p>
+          </div>
+
+          <div class="step-connector" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+
+          <div class="step-card">
+            <div class="step-badge">02</div>
+            <div class="step-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                <path d="M11 8v6"></path>
+                <path d="M8 11h6"></path>
+              </svg>
+            </div>
+            <h3 class="step-title">2. Retrieve verified BIS sources</h3>
+            <p class="step-desc">
+              ChromaDB semantic search retrieves exact chunks from official Gazette notifications, QCO orders, and BIS documentation.
+            </p>
+            <div class="step-mockup" aria-label="Illustrative retrieval preview">
+              <span class="mockup-caption">Illustrative retrieval preview</span>
+              <div class="mockup-source-cards">
+                <div class="mockup-source-card">
+                  <span class="evidence-type-badge">Quality Control Order</span>
+                  <span class="mockup-doc-title">Mandatory ISI Certification Directive</span>
+                </div>
+                <div class="mockup-source-card">
+                  <span class="evidence-type-badge">Gazette Notification</span>
+                  <span class="mockup-doc-title">Hallmarking Purity Standards Order</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="step-connector" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </div>
+
+          <div class="step-card">
+            <div class="step-badge">03</div>
+            <div class="step-icon-wrap">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+            </div>
+            <h3 class="step-title">3. Grounded answer with citations</h3>
+            <p class="step-desc">
+              Synthesized response directly cites official reference standards and clauses. If out of scope, the assistant explicitly declines to guess.
+            </p>
+            <div class="step-mockup" aria-label="Illustrative response format">
+              <span class="mockup-caption">Illustrative response format</span>
+              <div class="mockup-answer-box">
+                <div class="mockup-answer-line">
+                  <span class="mockup-line-tag">Answer:</span>
+                  <span class="mockup-line-text">Grounded summary based strictly on verified reference records.</span>
+                </div>
+                <div class="mockup-evidence-line">
+                  <span class="mockup-line-tag">Evidence:</span>
+                  <span class="evidence-num">[01]</span>
+                  <span class="evidence-type-badge">Official BIS Record</span>
+                  <span class="mockup-evidence-title">Referenced Standard Specification</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-cta-wrap">
+          <a href="chat.html" class="btn btn-primary btn-hero-primary">
+            <span>Ask the BISure Assistant</span>
+            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <polyline points="19 12 12 19 5 12"></polyline>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ================= SITE FOOTER ================= -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="section-container footer-container">
+      <div class="footer-top">
+        <div class="footer-brand">
+          <div class="brand-group">
+            <svg class="brand-mark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+              <polygon points="12 2 21 7 21 17 12 22 3 17 3 7 12 2"></polygon>
+              <polyline points="8 12 11 15 16 9"></polyline>
+            </svg>
+            <span class="brand-title"><span class="brand-bold">BIS</span>ure</span>
+          </div>
+          <p class="footer-tagline">
+            Source-backed intelligence for Indian Standards, Quality Control Orders, and Bureau of Indian Standards compliance.
+          </p>
+        </div>
+
+        <div class="footer-links-group">
+          <div class="footer-col">
+            <h4 class="footer-col-title">Navigation</h4>
+            <ul class="footer-nav-list">
+              <li><a href="index.html">Home</a></li>
+              <li><a href="features.html">Features</a></li>
+              <li><a href="how-it-works.html">How It Works</a></li>
+              <li><a href="chat.html">Assistant</a></li>
+              <li><a href="about.html">About &amp; Scope</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <h4 class="footer-col-title">Official Portals</h4>
+            <ul class="footer-nav-list">
+              <li><a href="https://www.bis.gov.in" target="_blank" rel="noopener noreferrer">BIS Official Portal &nearr;</a></li>
+              <li><a href="https://www.services.bis.gov.in" target="_blank" rel="noopener noreferrer">BIS CARE Portal &nearr;</a></li>
+              <li><a href="https://consumeraffairs.nic.in" target="_blank" rel="noopener noreferrer">Consumer Affairs &nearr;</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <h4 class="footer-col-title">Project Info</h4>
+            <ul class="footer-nav-list">
+              <li><span class="footer-meta-line">PS ID: SIH26107</span></li>
+              <li><span class="footer-meta-line">Smart India Hackathon 2026</span></li>
+              <li>
+                <a href="https://github.com/Prabin-Jena/BISure" target="_blank" rel="noopener noreferrer" class="github-link">
+                  <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16" aria-hidden="true">
+                    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"></path>
+                  </svg>
+                  <span>GitHub Repository &nearr;</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p class="copyright-text">&copy; 2026 BISure &bull; Team Semantic Syndicate. All rights reserved.</p>
+        <p class="footer-disclaimer">
+          Built for demonstration at Smart India Hackathon 2026. For statutory legal certifications, please refer to bis.gov.in.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="common.js"></script>
+</body>
+</html>
