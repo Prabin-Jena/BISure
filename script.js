@@ -1,5 +1,5 @@
 // BISure Assistant — Frontend Engine
-// Vanilla JS with theme management, streaming handling, atomic history, and error recovery.
+// Vanilla JS with theme management, streaming handling, atomic history, error recovery, and product landing interactions.
 
 // --- DOM References ---
 const chatForm = document.getElementById("chat-form");
@@ -9,12 +9,16 @@ const messageList = document.getElementById("message-list");
 const emptyState = document.getElementById("empty-state");
 const themeToggle = document.getElementById("theme-toggle");
 const connectionStatus = document.getElementById("connection-status");
+const coldStartBanner = document.getElementById("cold-start-banner");
+const newChatBtn = document.getElementById("new-chat-btn");
 
 // --- Runtime State ---
 let abortController = null;
 let isWaitingForResponse = false;
 let hasActiveError = false;
 let lastFailedQuery = null;
+let hasReceivedFirstResponse = false;
+let coldStartTimer = null;
 
 // Only stores confirmed turns: [{ role: "user" | "assistant", content: string }]
 const conversationHistory = [];
@@ -26,23 +30,22 @@ function initializeTheme() {
     document.documentElement.setAttribute("data-theme", storedTheme);
   } else {
     // Rely on prefers-color-scheme media query initially
-    const prefersDark = window.matchMedia(
-      "(prefers-color-scheme: dark)",
-    ).matches;
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
     document.documentElement.setAttribute(
       "data-theme",
-      prefersDark ? "dark" : "light",
+      prefersDark ? "dark" : "light"
     );
   }
 }
 
-themeToggle.addEventListener("click", () => {
-  const currentTheme =
-    document.documentElement.getAttribute("data-theme") || "light";
-  const nextTheme = currentTheme === "dark" ? "light" : "dark";
-  document.documentElement.setAttribute("data-theme", nextTheme);
-  localStorage.setItem("bisure-theme", nextTheme);
-});
+if (themeToggle) {
+  themeToggle.addEventListener("click", () => {
+    const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
+    const nextTheme = currentTheme === "dark" ? "light" : "dark";
+    document.documentElement.setAttribute("data-theme", nextTheme);
+    localStorage.setItem("bisure-theme", nextTheme);
+  });
+}
 
 initializeTheme();
 
@@ -54,15 +57,15 @@ function setConnectionStatus(state) {
 
   if (state === "online") {
     connectionStatus.title = "Local BISure service is available";
-    label.textContent = "Service online";
+    if (label) label.textContent = "Service online";
   } else if (state === "offline") {
     connectionStatus.classList.add("is-offline");
     connectionStatus.title = "Start the local BISure backend to ask questions";
-    label.textContent = "Service offline";
+    if (label) label.textContent = "Service offline";
   } else {
     connectionStatus.classList.add("is-checking");
     connectionStatus.title = "Checking the local BISure service";
-    label.textContent = "Checking service";
+    if (label) label.textContent = "Checking service";
   }
 }
 
@@ -85,6 +88,13 @@ async function checkServiceHealth() {
     setConnectionStatus("offline");
   } finally {
     clearTimeout(timeoutId);
+  }
+}
+
+// --- Cold Start UI Management ---
+function setColdStartNotice(visible) {
+  if (coldStartBanner) {
+    coldStartBanner.hidden = !visible;
   }
 }
 
@@ -132,6 +142,7 @@ function formatAnswer(text) {
 }
 
 function autoResizeTextarea(textarea) {
+  if (!textarea) return;
   textarea.style.height = "auto";
   const maxHeight = 140;
   const newHeight = Math.min(textarea.scrollHeight, maxHeight);
@@ -141,34 +152,57 @@ function autoResizeTextarea(textarea) {
 }
 
 function scrollToBottom() {
+  if (!messageList) return;
   messageList.scrollTo({ top: messageList.scrollHeight, behavior: "smooth" });
 }
 
 function setBusy(busy) {
   isWaitingForResponse = busy;
-  sendButton.disabled = busy;
-  userInput.disabled = busy || hasActiveError;
-  sendButton.setAttribute("aria-busy", busy);
+  if (sendButton) {
+    sendButton.disabled = busy;
+    sendButton.setAttribute("aria-busy", busy);
+    const sendIcon = sendButton.querySelector(".send-icon");
+    const spinnerIcon = sendButton.querySelector(".spinner-icon");
+    if (sendIcon && spinnerIcon) {
+      sendIcon.hidden = busy;
+      spinnerIcon.hidden = !busy;
+    }
+  }
 
-  const sendIcon = sendButton.querySelector(".send-icon");
-  const spinnerIcon = sendButton.querySelector(".spinner-icon");
+  if (userInput) {
+    userInput.disabled = busy || hasActiveError;
+  }
 
-  if (sendIcon && spinnerIcon) {
-    sendIcon.hidden = busy;
-    spinnerIcon.hidden = !busy;
+  // Manage Cold-Start indicator banner
+  if (busy) {
+    if (!hasReceivedFirstResponse) {
+      // Show immediately on first question to reassure judges during free-tier cloud spin-up
+      setColdStartNotice(true);
+    } else {
+      // If a subsequent question takes over 3.5 seconds, display the notice
+      coldStartTimer = setTimeout(() => {
+        setColdStartNotice(true);
+      }, 3500);
+    }
+  } else {
+    if (coldStartTimer) {
+      clearTimeout(coldStartTimer);
+      coldStartTimer = null;
+    }
+    setColdStartNotice(false);
   }
 }
 
 function setErrorLock(locked) {
   hasActiveError = locked;
-  userInput.disabled = locked;
-  sendButton.disabled = locked;
+  if (userInput) userInput.disabled = locked;
+  if (sendButton) sendButton.disabled = locked;
 
-  if (locked) {
+  if (locked && userInput) {
     userInput.dataset.originalPlaceholder = userInput.placeholder;
     userInput.placeholder =
       "Connection issue: Retry or Dismiss above before continuing...";
-  } else {
+  } else if (userInput) {
     userInput.placeholder =
       userInput.dataset.originalPlaceholder ||
       "Ask about BIS standards, hallmarking rules, or certification...";
@@ -185,41 +219,95 @@ function commitHistory(query, answer) {
 }
 
 // --- Render Elements ---
+function detectSourceType(title = "", rawType = "") {
+  const t = (String(title) + " " + String(rawType)).toLowerCase();
+  if (t.includes("gazette") || t.includes("notification") || t.includes("s.o.") || t.includes("g.s.r.")) {
+    return "Gazette Notification";
+  }
+  if (t.includes("qco") || t.includes("quality control") || t.includes("order")) {
+    return "Quality Control Order";
+  }
+  if (t.includes("hallmark") || t.includes("huid") || t.includes("jewell")) {
+    return "Hallmarking Directive";
+  }
+  if (t.includes("guidance") || t.includes("manual") || t.includes("guideline")) {
+    return "BIS Guidance Document";
+  }
+  if (t.includes("crs") || t.includes("compulsory registration")) {
+    return "CRS Scheme Regulation";
+  }
+  if (t.includes("is ") || t.includes("is/") || t.includes("is:") || t.includes("standard")) {
+    return "Indian Standard Specification";
+  }
+  return "Official BIS Record";
+}
+
 function renderSources(container, sources) {
   if (!Array.isArray(sources) || sources.length === 0) return;
 
+  const existing = container.querySelector(".assistant-evidence-block");
+  if (existing) existing.remove();
+
   const details = document.createElement("details");
-  details.className = "message-sources";
+  details.className = "assistant-evidence-block";
+  details.open = true;
 
   const summary = document.createElement("summary");
-  summary.className = "sources-summary";
-  summary.innerHTML = `<span class="sources-badge">${sources.length}</span> Reference Standards`;
+  summary.className = "evidence-header";
+  summary.innerHTML = `
+    <div class="evidence-header-left">
+      <svg class="evidence-header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
+        <polyline points="10 9 9 9 8 9"></polyline>
+      </svg>
+      <span class="evidence-header-title">Verified Sources &amp; Citations</span>
+    </div>
+    <span class="evidence-badge">${sources.length} ${sources.length === 1 ? "Verified Source" : "Verified Sources"}</span>
+  `;
   details.appendChild(summary);
 
-  const list = document.createElement("ul");
-  list.className = "sources-list";
-  sources.forEach((src) => {
-    const item = document.createElement("li");
-    item.className = "source-item";
+  const cardList = document.createElement("div");
+  cardList.className = "evidence-cards-list";
 
-    const title = document.createElement("span");
-    title.className = "source-title";
-    title.textContent = src.title || "Indian Standard Specification";
+  sources.forEach((src, idx) => {
+    const card = document.createElement("div");
+    card.className = "evidence-card";
 
-    if (src.snippet) {
-      const snippet = document.createElement("span");
-      snippet.className = "source-snippet";
-      snippet.textContent = src.snippet;
-      item.appendChild(title);
-      item.appendChild(snippet);
-    } else {
-      item.appendChild(title);
+    const cardHeader = document.createElement("div");
+    cardHeader.className = "evidence-card-header";
+
+    const numSpan = document.createElement("span");
+    numSpan.className = "evidence-num";
+    numSpan.textContent = `[${String(idx + 1).padStart(2, "0")}]`;
+
+    const typeBadge = document.createElement("span");
+    typeBadge.className = "evidence-type-badge";
+    typeBadge.textContent = detectSourceType(src.title, src.type || src.doc_type);
+
+    cardHeader.appendChild(numSpan);
+    cardHeader.appendChild(typeBadge);
+
+    const docTitle = document.createElement("div");
+    docTitle.className = "evidence-doc-title";
+    docTitle.textContent = src.title || "Indian Standard Specification";
+
+    card.appendChild(cardHeader);
+    card.appendChild(docTitle);
+
+    if (src.snippet && src.snippet.trim()) {
+      const snippet = document.createElement("div");
+      snippet.className = "evidence-snippet";
+      snippet.textContent = src.snippet.trim();
+      card.appendChild(snippet);
     }
 
-    list.appendChild(item);
+    cardList.appendChild(card);
   });
 
-  details.appendChild(list);
+  details.appendChild(cardList);
   container.appendChild(details);
 }
 
@@ -278,27 +366,58 @@ function appendMessage(role, textContent, sources = []) {
   const wrapper = document.createElement("article");
   wrapper.className = `message message-${role}`;
 
-  const roleLabel = document.createElement("div");
-  roleLabel.className = "message-role";
-  roleLabel.textContent = role === "user" ? "You" : "BIS Standards Engine";
-
-  const body = document.createElement("div");
-  body.className = "message-body";
-
   if (role === "user") {
+    const roleLabel = document.createElement("div");
+    roleLabel.className = "message-role";
+    roleLabel.textContent = "You";
+
+    const body = document.createElement("div");
+    body.className = "message-body";
     body.textContent = textContent;
+
+    wrapper.appendChild(roleLabel);
+    wrapper.appendChild(body);
   } else {
-    body.innerHTML = formatAnswer(textContent);
+    const roleBar = document.createElement("div");
+    roleBar.className = "message-role-bar";
+
+    const roleLabel = document.createElement("span");
+    roleLabel.className = "message-role";
+    roleLabel.textContent = "BIS Standards Engine";
+
+    const groundedBadge = document.createElement("span");
+    groundedBadge.className = "grounded-badge";
+    groundedBadge.innerHTML = `
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+        <polyline points="20 6 9 17 4 12"></polyline>
+      </svg>
+      <span>Grounded Response</span>
+    `;
+
+    roleBar.appendChild(roleLabel);
+    roleBar.appendChild(groundedBadge);
+
+    const answerBlock = document.createElement("div");
+    answerBlock.className = "assistant-answer-block";
+
+    const body = document.createElement("div");
+    body.className = "message-body";
+    if (textContent) {
+      body.innerHTML = formatAnswer(textContent);
+    }
+    answerBlock.appendChild(body);
+
+    wrapper.appendChild(roleBar);
+    wrapper.appendChild(answerBlock);
+
+    if (sources && sources.length > 0) {
+      renderSources(wrapper, sources);
+    }
   }
 
-  wrapper.appendChild(roleLabel);
-  wrapper.appendChild(body);
-
-  if (role === "assistant") {
-    renderSources(wrapper, sources);
+  if (textContent) {
+    renderMessageActions(wrapper, textContent, role);
   }
-
-  renderMessageActions(wrapper, textContent, role);
 
   if (emptyState && !emptyState.hidden) {
     emptyState.hidden = true;
@@ -313,6 +432,14 @@ function showTypingIndicator() {
   const indicator = document.createElement("article");
   indicator.className = "message message-assistant typing-indicator";
   indicator.id = "typing-indicator";
+  
+  const coldNoteHtml = !hasReceivedFirstResponse
+    ? `<div class="typing-cold-note">
+         <span class="cold-dot"></span>
+         <span>Waking up the assistant, this can take up to a minute on first load...</span>
+       </div>`
+    : "";
+
   indicator.innerHTML = `
     <div class="message-role">BIS Standards Engine</div>
     <div class="typing-body">
@@ -324,6 +451,7 @@ function showTypingIndicator() {
         <span></span><span></span><span></span>
       </div>
     </div>
+    ${coldNoteHtml}
   `;
   messageList.appendChild(indicator);
   scrollToBottom();
@@ -433,6 +561,7 @@ async function requestBatch(query) {
     throw new Error("The service returned an empty answer. Please retry.");
   }
 
+  hasReceivedFirstResponse = true;
   hideTypingIndicator();
   commitHistory(query, answer);
   appendMessage("assistant", answer, sources);
@@ -474,13 +603,13 @@ async function requestStream(query) {
     throw new Error(`Stream returned HTTP ${response.status}`);
   }
 
+  hasReceivedFirstResponse = true;
   hideTypingIndicator();
 
   const assistantBubble = appendMessage("assistant", "");
   const bodyEl = assistantBubble.querySelector(".message-body");
 
-  let accumulatedText = "";
-  let extractedSources = [];
+  let streamBuffer = "";
 
   try {
     const reader = response.body.getReader();
@@ -490,30 +619,41 @@ async function requestStream(query) {
       const { value, done } = await reader.read();
       if (done) break;
 
-      const chunk = decoder.decode(value, { stream: true });
+      streamBuffer += decoder.decode(value, { stream: true });
 
-      if (chunk.includes("__SOURCES__:")) {
-        const parts = chunk.split("__SOURCES__:");
-        accumulatedText += parts[0];
-        try {
-          extractedSources = JSON.parse(parts[1]);
-        } catch (e) {
-          console.warn("Failed to parse sources frame:", e);
-        }
-      } else {
-        accumulatedText += chunk;
-      }
-
-      bodyEl.innerHTML = formatAnswer(accumulatedText);
+      // While streaming, render only the text before __SOURCES__:
+      const liveAnswer = streamBuffer.split("__SOURCES__:")[0];
+      bodyEl.innerHTML = formatAnswer(liveAnswer);
       scrollToBottom();
     }
 
-    commitHistory(query, accumulatedText);
-    renderMessageActions(assistantBubble, accumulatedText, "assistant");
+    // Flush any remaining stream bytes
+    streamBuffer += decoder.decode();
+
+    let finalAnswer = streamBuffer;
+    let extractedSources = [];
+
+    if (streamBuffer.includes("__SOURCES__:")) {
+      const parts = streamBuffer.split("__SOURCES__:");
+      finalAnswer = parts[0].trim();
+      const rawSources = parts.slice(1).join("__SOURCES__:").trim();
+      try {
+        extractedSources = JSON.parse(rawSources);
+      } catch (e) {
+        console.warn("Failed to parse sources JSON payload:", e);
+      }
+    } else {
+      finalAnswer = finalAnswer.trim();
+    }
+
+    bodyEl.innerHTML = formatAnswer(finalAnswer);
+    commitHistory(query, finalAnswer);
 
     if (extractedSources.length > 0) {
       renderSources(assistantBubble, extractedSources);
     }
+    renderMessageActions(assistantBubble, finalAnswer, "assistant");
+    scrollToBottom();
   } catch (streamErr) {
     assistantBubble.remove();
     throw streamErr;
@@ -569,6 +709,7 @@ chatForm.addEventListener("submit", (event) => {
   executeTurn(query, true);
 });
 
+// Empty-state suggestion buttons inside chat panel
 emptyState.addEventListener("click", (event) => {
   if (isWaitingForResponse || hasActiveError) return;
   const card = event.target.closest(".category-card");
@@ -580,6 +721,73 @@ emptyState.addEventListener("click", (event) => {
     executeTurn(prompt, true);
   }
 });
+
+// Feature Grid Sample Query Buttons (Pre-fill input & smooth scroll to #chat)
+document.querySelectorAll(".sample-query-btn").forEach((button) => {
+  button.addEventListener("click", () => {
+    const prompt = button.getAttribute("data-prompt");
+    if (!prompt) return;
+
+    userInput.value = prompt;
+    autoResizeTextarea(userInput);
+
+    const chatSection = document.getElementById("chat");
+    if (chatSection) {
+      chatSection.scrollIntoView({ behavior: "smooth" });
+    }
+
+    setTimeout(() => {
+      userInput.focus();
+    }, 450);
+  });
+});
+
+// Smooth scrolling for navigation links
+document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+  anchor.addEventListener("click", function (e) {
+    const targetId = this.getAttribute("href");
+    if (targetId === "#") return;
+
+    const targetEl = document.querySelector(targetId);
+    if (targetEl) {
+      e.preventDefault();
+      targetEl.scrollIntoView({ behavior: "smooth" });
+    }
+  });
+});
+
+// --- New Conversation / Reset ---
+function resetConversation() {
+  if (abortController) {
+    try {
+      abortController.abort();
+    } catch (e) {}
+    abortController = null;
+  }
+  isWaitingForResponse = false;
+  setBusy(false);
+  hideTypingIndicator();
+  dismissActiveError();
+
+  conversationHistory.length = 0;
+
+  const messages = messageList.querySelectorAll(".message, .error-banner, .retry-banner");
+  messages.forEach((msg) => msg.remove());
+
+  if (emptyState) {
+    emptyState.hidden = false;
+  }
+
+  if (userInput) {
+    userInput.value = "";
+    autoResizeTextarea(userInput);
+    userInput.focus();
+  }
+}
+
+if (newChatBtn) {
+  newChatBtn.addEventListener("click", resetConversation);
+}
 
 userInput.addEventListener("input", () => autoResizeTextarea(userInput));
 
@@ -595,3 +803,4 @@ userInput.addEventListener("keydown", (event) => {
 
 autoResizeTextarea(userInput);
 checkServiceHealth();
+
