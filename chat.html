@@ -62,7 +62,7 @@
     </div>
   </header>
 
-  <main>
+  <main id="main-content">
     <!-- ================= CHAT APP SECTION ================= -->
     <section id="chat" class="chat-section" aria-labelledby="chat-heading">
       <div class="section-container">
@@ -120,7 +120,7 @@
 
               <div class="category-grid" aria-label="Sample questions">
                 <!-- Card 1: Single subtle demo indicator -->
-                <button type="button" class="category-card category-card-recommended" data-prompt="What are the mandatory gold hallmarking rules, carats covered, and how to verify a 6-digit HUID?">
+                <button type="button" class="category-card category-card-recommended" data-prompt="What are the mandatory gold hallmarking rules, carats covered, and how to verify a HUID?">
                   <div class="card-icon card-icon-gold">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                       <circle cx="12" cy="12" r="7"></circle>
@@ -176,7 +176,7 @@
                   </div>
                   <div class="card-text">
                     <span class="card-title">License Authentication</span>
-                    <span class="card-desc">Checking 7-digit CML license validity and filing complaints.</span>
+                    <span class="card-desc">Checking CML license validity and filing complaints.</span>
                   </div>
                 </button>
               </div>
@@ -216,6 +216,9 @@
                 <p id="input-hint" class="input-hint">Press <kbd>Enter</kbd> to submit, <kbd>Shift + Enter</kbd> for a new line</p>
               </div>
             </form>
+            <p class="composer-disclaimer">
+              BISure provides source-grounded information for assistance. For official statutory certifications or compliance decisions, refer to the Bureau of Indian Standards.
+            </p>
           </div>
         </div>
       </div>
@@ -289,6 +292,7 @@
 
   <script src="config.js"></script>
   <script src="common.js"></script>
+  <script src="motion.js"></script>
   <script src="chat.js"></script>
 </body>
 </html>
