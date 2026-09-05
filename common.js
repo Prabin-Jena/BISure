@@ -7,11 +7,7 @@ function initializeTheme() {
   if (storedTheme === "light" || storedTheme === "dark") {
     document.documentElement.setAttribute("data-theme", storedTheme);
   } else {
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    document.documentElement.setAttribute(
-      "data-theme",
-      prefersDark ? "dark" : "light"
-    );
+    document.documentElement.setAttribute("data-theme", "dark");
   }
 }
 
@@ -36,14 +32,33 @@ function initNavToggle() {
   const navLinks = document.getElementById("primary-nav");
   if (!navToggle || !navLinks) return;
 
+  let backdrop = document.querySelector(".nav-backdrop");
+  if (!backdrop) {
+    backdrop = document.createElement("div");
+    backdrop.className = "nav-backdrop";
+    backdrop.setAttribute("aria-hidden", "true");
+    document.body.appendChild(backdrop);
+  }
+
+  let savedBodyOverflow = "";
+
   function openMenu() {
+    savedBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     navToggle.setAttribute("aria-expanded", "true");
     navLinks.classList.add("is-open");
+    backdrop.classList.add("is-active");
   }
 
   function closeMenu() {
+    if (savedBodyOverflow) {
+      document.body.style.overflow = savedBodyOverflow;
+    } else {
+      document.body.style.removeProperty("overflow");
+    }
     navToggle.setAttribute("aria-expanded", "false");
     navLinks.classList.remove("is-open");
+    backdrop.classList.remove("is-active");
   }
 
   function toggleMenu() {
@@ -58,6 +73,11 @@ function initNavToggle() {
   navToggle.addEventListener("click", (e) => {
     e.stopPropagation();
     toggleMenu();
+  });
+
+  // Close when backdrop is clicked
+  backdrop.addEventListener("click", () => {
+    closeMenu();
   });
 
   // Close on link selection
@@ -161,9 +181,56 @@ async function checkServiceHealth() {
   }
 }
 
+// --- Active Navigation State Management ---
+const NAMESPACE_HREF_MAP = {
+  home: "index.html",
+  features: "features.html",
+  "how-it-works": "how-it-works.html",
+  about: "about.html",
+  chat: "chat.html"
+};
+
+function updateActiveNav(namespace) {
+  const navLinks = document.getElementById("primary-nav");
+  if (!navLinks) return;
+
+  const targetHref = NAMESPACE_HREF_MAP[namespace];
+  navLinks.querySelectorAll(".nav-link").forEach((link) => {
+    const href = link.getAttribute("href") || "";
+    // Match either the full href or ending filename
+    const isMatch = targetHref && (href === targetHref || href.endsWith("/" + targetHref));
+    if (isMatch) {
+      link.classList.add("nav-active");
+      link.setAttribute("aria-current", "page");
+    } else {
+      link.classList.remove("nav-active");
+      link.removeAttribute("aria-current");
+    }
+  });
+}
+
+function closeMobileNav() {
+  const navToggle = document.getElementById("nav-toggle");
+  const navLinks = document.getElementById("primary-nav");
+  const backdrop = document.querySelector(".nav-backdrop");
+  if (navToggle && navLinks) {
+    navToggle.setAttribute("aria-expanded", "false");
+    navLinks.classList.remove("is-open");
+  }
+  if (backdrop) {
+    backdrop.classList.remove("is-active");
+  }
+  document.body.style.removeProperty("overflow");
+}
+
 // --- Smooth scrolling for on-page hash links ---
-function initSmoothScrolling() {
-  document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+function initSmoothScrolling(scope) {
+  const root = scope || document;
+  root.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+    // Avoid double-binding
+    if (anchor.dataset.smoothScrollBound) return;
+    anchor.dataset.smoothScrollBound = "true";
+
     anchor.addEventListener("click", function (e) {
       const targetId = this.getAttribute("href");
       if (targetId === "#" || !targetId) return;
@@ -184,3 +251,11 @@ document.addEventListener("DOMContentLoaded", () => {
   initSmoothScrolling();
   checkServiceHealth();
 });
+
+// Expose shared utilities on global window.BISureCommon
+window.BISureCommon = {
+  updateActiveNav,
+  closeMobileNav,
+  initSmoothScrolling,
+  checkServiceHealth
+};
