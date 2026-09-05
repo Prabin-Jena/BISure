@@ -7,6 +7,9 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <!-- Accessible Skip-to-Content Link -->
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
   <!-- ================= STICKY TOP NAV ================= -->
   <header class="site-header" role="banner">
     <div class="nav-container">
@@ -63,424 +66,581 @@
     </div>
   </header>
 
-  <main>
-    <!-- ================= HERO SECTION ================= -->
-    <section class="hero-section" aria-labelledby="hero-heading">
-      <div class="section-container hero-container">
+  <main id="main-content">
+    <!-- ================= 1. HERO SECTION ================= -->
+    <section id="hero" class="hero-section" aria-labelledby="hero-heading">
+      <div class="section-container hero-grid">
         <div class="hero-content">
           <div class="hero-pill">
-            <span class="pill-dot"></span>
+            <span class="pill-dot" aria-hidden="true"></span>
             <span>Smart India Hackathon 2026 &bull; PS ID: SIH26107</span>
           </div>
-          <h1 id="hero-heading" class="hero-title">
-            Ask about Indian Standards &amp; Certification
+          <h1 id="hero-heading" class="hero-headline">
+            Don't just get an answer.<br />Know what supports it.
           </h1>
-          <p class="hero-description">
-            Source-grounded intelligence for verifying mandatory Quality Control Orders, Gold Hallmarking, ISI conformity, and consumer license authenticity.
+          <p class="hero-lead">
+            Source-grounded intelligence for Indian Standards, Quality Control Orders, and Bureau of Indian Standards compliance. Trace every statement to official Gazette notifications and technical clauses.
           </p>
-          <p class="hero-capabilities">QCOs &bull; Hallmarking &bull; ISI &bull; CRS &bull; CML</p>
-
-          <div class="hero-actions">
+          <div class="hero-actions-group">
             <a href="chat.html" class="btn btn-primary btn-hero-primary">
-              <span>Ask the Assistant</span>
-              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <polyline points="19 12 12 19 5 12"></polyline>
-              </svg>
-            </a>
-            <a href="how-it-works.html" class="btn btn-secondary btn-hero-secondary">
-              <span>How It Works</span>
+              <span>Query the Assistant</span>
               <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <line x1="5" y1="12" x2="19" y2="12"></line>
                 <polyline points="12 5 19 12 12 19"></polyline>
               </svg>
             </a>
+            <a href="#problem" class="btn btn-secondary btn-hero-secondary">
+              <span>Explore the Pipeline</span>
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <polyline points="19 12 12 19 5 12"></polyline>
+              </svg>
+            </a>
           </div>
-
-          <!-- Trust Strip -->
-          <div class="trust-strip" aria-label="Project Credibility">
+          <div class="trust-strip" aria-label="Project Verification Basis">
             <div class="trust-item">
               <svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                 <polyline points="9 12 11 14 15 10"></polyline>
               </svg>
-              <span>Source-backed answers</span>
+              <span>Gazette Notifications</span>
             </div>
             <span class="trust-separator" aria-hidden="true">&bull;</span>
             <div class="trust-item">
               <svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <circle cx="12" cy="8" r="7"></circle>
-                <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+                <circle cx="12" cy="12" r="9"></circle>
+                <polyline points="12 7 12 12 15 15"></polyline>
               </svg>
-              <span>Built for SIH 2026</span>
+              <span>Mandatory QCOs</span>
             </div>
             <span class="trust-separator" aria-hidden="true">&bull;</span>
             <div class="trust-item">
               <svg class="trust-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                <polygon points="12 2 21 7 21 17 12 22 3 17 3 7 12 2"></polygon>
+                <polyline points="8 12 11 15 16 9"></polyline>
               </svg>
-              <span>Team Semantic Syndicate</span>
+              <span>IS Standard Clauses</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Static representation of 5 stages (Final-state at rest) -->
+        <div class="hero-pipeline-preview" aria-label="Pipeline Rest-State Preview">
+          <div class="pipeline-header">
+            <span class="pipeline-header-title">RAG Verification Chain</span>
+            <span class="pipeline-live-pill">
+              <span class="pipeline-live-dot" aria-hidden="true"></span>
+              <span>Grounded Rest-State</span>
+            </span>
+          </div>
+          <div class="pipeline-track">
+            <!-- Stage 1 -->
+            <div class="pipeline-step">
+              <span class="pipeline-step-badge">01</span>
+              <div class="pipeline-step-content">
+                <div class="pipeline-step-phase">Question</div>
+                <p class="pipeline-step-desc">"Is BIS certification mandatory for mobile phone chargers?"</p>
+              </div>
+            </div>
+            <!-- Stage 2 -->
+            <div class="pipeline-step">
+              <span class="pipeline-step-badge">02</span>
+              <div class="pipeline-step-content">
+                <div class="pipeline-step-phase">Retrieving Sources</div>
+                <p class="pipeline-step-desc">ChromaDB semantic search evaluates electronics &amp; IT goods regulations.</p>
+              </div>
+            </div>
+            <!-- Stage 3 -->
+            <div class="pipeline-step">
+              <span class="pipeline-step-badge">03</span>
+              <div class="pipeline-step-content">
+                <div class="pipeline-step-phase">Relevant Evidence Found</div>
+                <p class="pipeline-step-desc">Matched Gazette Order S.O. 2357 &amp; Scheme-II CRS Schedule Item 1.</p>
+              </div>
+            </div>
+            <!-- Stage 4 -->
+            <div class="pipeline-step">
+              <span class="pipeline-step-badge">04</span>
+              <div class="pipeline-step-content">
+                <div class="pipeline-step-phase">Evidence Connected</div>
+                <p class="pipeline-step-desc">Linked compliance requirements to test standard IS 13252 (Part 1).</p>
+              </div>
+            </div>
+            <!-- Stage 5 -->
+            <div class="pipeline-step step-grounded">
+              <span class="pipeline-step-badge">05</span>
+              <div class="pipeline-step-content">
+                <div class="pipeline-step-phase">Grounded Response</div>
+                <p class="pipeline-step-desc">Mandatory CRS Scheme-II registration confirmed with document citations [01][02].</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- ================= FEATURE GRID (COMPACT PREVIEW) ================= -->
-    <section id="features" class="features-section" aria-labelledby="features-heading">
+    <!-- ================= 2. THE PROBLEM ================= -->
+    <section id="problem" class="editorial-section" aria-labelledby="problem-heading">
       <div class="section-container">
         <div class="section-header">
-          <span class="section-eyebrow">Core Capabilities</span>
-          <h2 id="features-heading" class="section-title">Key Regulatory Standards Covered</h2>
+          <span class="section-eyebrow">The Verification Dilemma</span>
+          <h2 id="problem-heading" class="section-title">Answers are easy to find. Proof is harder.</h2>
           <p class="section-subtext">
-            Explore primary compliance domains under the Bureau of Indian Standards.
+            When asking regulatory questions, generic conversational models assemble fluent prose by blending official Gazette notifications with outdated forum posts, e-commerce hearsay, and expired proposals.
           </p>
         </div>
 
-        <div class="feature-grid">
-          <!-- Card 1: Gold Hallmarking -->
-          <div class="feature-card">
-            <div class="feature-card-header">
-              <div class="card-icon card-icon-gold">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                  <circle cx="12" cy="12" r="7"></circle>
-                  <polyline points="12 9 12 12 13.5 13.5"></polyline>
-                  <path d="M16.51 17.35l-.35 3.83a2 2 0 0 1-2 1.82H9.83a2 2 0 0 1-2-1.82l-.35-3.83m.01-10.7l.35-3.83A2 2 0 0 1 9.83 1h4.35a2 2 0 0 1 2 1.82l.35 3.83"></path>
-                </svg>
-              </div>
-              <div class="feature-card-meta">
-                <h3 class="feature-card-title">Gold Hallmarking &amp; HUID</h3>
-                <span class="feature-badge">IS 1417 Standards</span>
-              </div>
-            </div>
-            <p class="feature-card-desc">
-              Mandatory purity standards (14k, 18k, 22k) and 6-digit HUID verification.
-            </p>
+        <div class="problem-canvas" aria-label="Branching information comparison diagram">
+          <div class="problem-query-hub">
+            <div class="problem-query-tag">User Inquiry</div>
+            <p class="problem-query-text">"Are imported plastic toys required to carry the ISI mark before sale?"</p>
           </div>
 
-          <!-- Card 2: Mandatory ISI / QCOs -->
-          <div class="feature-card">
-            <div class="feature-card-header">
-              <div class="card-icon card-icon-navy">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                  <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
-                  <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
-                </svg>
+          <div class="problem-branches-grid">
+            <!-- Node A: Official Gazette -->
+            <div class="problem-node node-verified">
+              <div class="problem-node-header">
+                <span class="problem-node-source">Gazette Notification S.O. 853(E)</span>
+                <span class="problem-node-badge badge-verified">Statutory Authority</span>
               </div>
-              <div class="feature-card-meta">
-                <h3 class="feature-card-title">Mandatory ISI / QCOs</h3>
-                <span class="feature-badge">Gazette Orders</span>
-              </div>
+              <p class="problem-node-claim">
+                "Toys (Quality Control) Order, 2020: Compulsory ISI mark required under Scheme-I for all toys imported or manufactured in India."
+              </p>
             </div>
-            <p class="feature-card-desc">
-              Compulsory ISI certification orders covering toys, appliances, cement, steel, and helmets.
-            </p>
+
+            <!-- Node B: Outdated Blog -->
+            <div class="problem-node node-obsolete">
+              <div class="problem-node-header">
+                <span class="problem-node-source">Export-Import Blog (2018)</span>
+                <span class="problem-node-badge badge-flagged">Obsolete Context</span>
+              </div>
+              <p class="problem-node-claim">
+                "Claims toys only require self-declaration and sampling at customs ports without mandatory factory licensing."
+              </p>
+            </div>
+
+            <!-- Node C: Forum Thread -->
+            <div class="problem-node node-conflicting">
+              <div class="problem-node-header">
+                <span class="problem-node-source">Trade Forum Discussion (2022)</span>
+                <span class="problem-node-badge badge-flagged">Conflicting / Rumor</span>
+              </div>
+              <p class="problem-node-claim">
+                "Suggests that imported electronic toys fall under CRS Scheme-II, confusing IT hardware rules with the Toys QCO."
+              </p>
+            </div>
+
+            <!-- Node D: Draft Proposal -->
+            <div class="problem-node node-unverified">
+              <div class="problem-node-header">
+                <span class="problem-node-source">Ministry Draft Discussion Note</span>
+                <span class="problem-node-badge badge-neutral">Non-Binding</span>
+              </div>
+              <p class="problem-node-claim">
+                "Proposes future exemptions for micro-scale artisans that were not ratified in the final enforceable statutory order."
+              </p>
+            </div>
           </div>
 
-          <!-- Card 3: CRS vs ISI Scheme -->
-          <div class="feature-card">
-            <div class="feature-card-header">
-              <div class="card-icon card-icon-slate">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                  <rect x="4" y="4" width="16" height="16" rx="2"></rect>
-                  <line x1="9" y1="9" x2="15" y2="15"></line>
-                  <line x1="15" y1="9" x2="9" y2="15"></line>
-                </svg>
-              </div>
-              <div class="feature-card-meta">
-                <h3 class="feature-card-title">CRS vs. ISI Scheme</h3>
-                <span class="feature-badge">Scheme I vs Scheme II</span>
-              </div>
-            </div>
-            <p class="feature-card-desc">
-              Contrasting Scheme-I factory audit inspections with Scheme-II registration for electronics.
-            </p>
+          <div class="problem-verdict-banner">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20" aria-hidden="true" style="color: var(--color-trust); flex-shrink: 0;">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <span><strong>The Grounding Rule:</strong> Without deterministic source-mapping, plausible-sounding answers obscure whether a requirement is enforceable statutory law or obsolete speculation.</span>
           </div>
-
-          <!-- Card 4: License Authentication -->
-          <div class="feature-card">
-            <div class="feature-card-header">
-              <div class="card-icon card-icon-teal">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                  <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                </svg>
-              </div>
-              <div class="feature-card-meta">
-                <h3 class="feature-card-title">License Authentication</h3>
-                <span class="feature-badge">CML &amp; Verification</span>
-              </div>
-            </div>
-            <p class="feature-card-desc">
-              Verifying manufacturer 7-digit CML license numbers, scope, and reporting fraudulent markings.
-            </p>
-          </div>
-        </div>
-
-        <div class="section-cta-wrap">
-          <a href="features.html" class="btn btn-secondary">Explore all features &rarr;</a>
         </div>
       </div>
     </section>
 
-    <!-- ================= HOW IT WORKS (COMPACT PREVIEW) ================= -->
-    <section id="how-it-works" class="how-it-works-section" aria-labelledby="how-heading">
+    <!-- ================= 3. RETRIEVAL ================= -->
+    <section id="retrieval" class="editorial-section" aria-labelledby="retrieval-heading">
       <div class="section-container">
         <div class="section-header">
-          <span class="section-eyebrow">Architecture &amp; Trust</span>
-          <h2 id="how-heading" class="section-title">How BISure Works</h2>
+          <span class="section-eyebrow">Source Discovery</span>
+          <h2 id="retrieval-heading" class="section-title">Selective Retrieval: Filtering Noise from Legal Authority</h2>
           <p class="section-subtext">
-            Retrieves supporting knowledge before generating an answer. Questions outside the available knowledge base are handled through an explicit fallback.
+            BISure does not feed the open web or conversational assumptions into synthesis. Every inquiry performs semantic vector search across a curated corpus of official Indian Standards documents, scoring candidate passages by relevance.
           </p>
         </div>
 
-        <div class="steps-grid">
-          <div class="step-card">
-            <div class="step-badge">01</div>
-            <div class="step-icon-wrap">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-              </svg>
+        <div class="retrieval-flow" aria-label="Retrieval process from query to evaluated sources">
+          <!-- Step 1: Input -->
+          <div class="retrieval-box">
+            <div class="retrieval-box-title">01 &bull; Natural Language Query</div>
+            <div class="retrieval-query-card">
+              "What legal purity grades are recognized for gold hallmarking, and is 20K permitted?"
             </div>
-            <h3 class="step-title">1. Ask a question</h3>
-            <p class="step-desc">
-              Ask any natural language query on BIS standards, mandatory QCOs, hallmarking rules, or certification procedures.
+          </div>
+
+          <!-- Middle connector -->
+          <div class="retrieval-middle-connector" aria-hidden="true">
+            <div class="vector-connector-line"></div>
+            <div class="vector-engine-card">
+              <div>ChromaDB Semantic Filter</div>
+              <div style="font-size: 0.65rem; color: var(--color-text-muted); margin-top: 2px;">k=4-6 Cosine Search</div>
+            </div>
+            <div class="vector-connector-line"></div>
+          </div>
+
+          <!-- Step 2: Evaluated Sources -->
+          <div class="retrieval-box">
+            <div class="retrieval-box-title">02 &bull; Evaluated Candidate Sources</div>
+            <div class="retrieval-sources-stack">
+              <!-- Source 1 -->
+              <div class="source-eval-card source-selected">
+                <div class="source-eval-info">
+                  <div class="source-eval-doc">IS 1417:2016 &bull; Clause 4.1 (Purity Standards)</div>
+                  <div class="source-eval-clause">Specifies permitted caratage: 14K (585), 18K (750), 20K (833), 22K (916), 23K, 24K.</div>
+                </div>
+                <span class="source-eval-score score-selected">0.91 &bull; Match</span>
+              </div>
+
+              <!-- Source 2 -->
+              <div class="source-eval-card source-selected">
+                <div class="source-eval-info">
+                  <div class="source-eval-doc">Hallmarking Order Amendment (Gazette 2021)</div>
+                  <div class="source-eval-clause">Mandates inclusion of 20K, 23K, and 24K under compulsory HUID hallmarking provisions.</div>
+                </div>
+                <span class="source-eval-score score-selected">0.86 &bull; Match</span>
+              </div>
+
+              <!-- Source 3 -->
+              <div class="source-eval-card source-excluded">
+                <div class="source-eval-info">
+                  <div class="source-eval-doc">Draft Silver Hallmarking Advisory (2019)</div>
+                  <div class="source-eval-clause">Non-binding guidance for voluntary silver bullion marking.</div>
+                </div>
+                <span class="source-eval-score score-excluded">0.31 &bull; Filtered</span>
+              </div>
+
+              <!-- Source 4 -->
+              <div class="source-eval-card source-excluded">
+                <div class="source-eval-info">
+                  <div class="source-eval-doc">Jewellers Association Circular</div>
+                  <div class="source-eval-clause">Industry body commercial trade terms, not official BIS standard.</div>
+                </div>
+                <span class="source-eval-score score-excluded">0.24 &bull; Filtered</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 4. EVIDENCE CONNECTION ================= -->
+    <section id="evidence" class="editorial-section" aria-labelledby="evidence-heading">
+      <div class="section-container">
+        <div class="section-header">
+          <span class="section-eyebrow">Evidence Connection</span>
+          <h2 id="evidence-heading" class="section-title">Connecting Claims to Statutory Proof</h2>
+          <p class="section-subtext">
+            Before an answer is synthesized, every required claim is bound directly to supporting clauses in the retrieved documents. Each branch below represents an evidentiary connection.
+          </p>
+        </div>
+
+        <div class="evidence-connection-wrap" aria-label="Evidence connection branching graph">
+          <!-- Central Claim Hub -->
+          <div class="evidence-claim-hub" tabindex="0" role="region" aria-label="Verified Regulatory Claim. Hover or focus to illuminate all supporting evidence branches.">
+            <div class="claim-tag">Verified Regulatory Claim</div>
+            <p class="claim-statement">
+              "Gold jewellery sold by registered jewelers in mandatory districts must carry a Hallmark Unique Identification (HUID) code alongside the BIS logo and purity grade."
             </p>
           </div>
 
-          <div class="step-connector" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
+          <!-- Static SVG Connecting Paths (Animated via stroke-dash in Phase 5) -->
+          <svg class="evidence-svg-canvas" viewBox="0 0 900 60" preserveAspectRatio="none" aria-hidden="true">
+            <!-- Branch 1: Center to Left Card -->
+            <path d="M 450 0 C 450 30, 150 30, 150 60" data-branch="1"></path>
+            <!-- Branch 2: Center straight to Middle Card -->
+            <path d="M 450 0 C 450 25, 450 35, 450 60" data-branch="2"></path>
+            <!-- Branch 3: Center to Right Card -->
+            <path d="M 450 0 C 450 30, 750 30, 750 60" data-branch="3"></path>
+          </svg>
+
+          <!-- 3 Supporting Branches -->
+          <div class="evidence-branches-grid">
+            <div class="evidence-branch-card" data-branch="1" tabindex="0" role="button" aria-pressed="false" aria-label="Evidence Branch 1: Statutory Basis Gazette Notification">
+              <span class="branch-num">Branch 01 &bull; Statutory Basis</span>
+              <h3 class="branch-doc-title">Gazette Notification S.O. 1234(E)</h3>
+              <p class="branch-clause-text">
+                Issued under Section 14 of the BIS Act, 2016. Mandates compulsory hallmarking of gold jewellery in notified districts across India.
+              </p>
+            </div>
+
+            <div class="evidence-branch-card" data-branch="2" tabindex="0" role="button" aria-pressed="false" aria-label="Evidence Branch 2: Technical Specification IS 1417">
+              <span class="branch-num">Branch 02 &bull; Technical Specification</span>
+              <h3 class="branch-doc-title">IS 1417:2016 Specification</h3>
+              <p class="branch-clause-text">
+                Clause 4.2 formally specifies the three mandatory stamp marks: the BIS triangular mark, the fineness/caratage grade, and the HUID code.
+              </p>
+            </div>
+
+            <div class="evidence-branch-card" data-branch="3" tabindex="0" role="button" aria-pressed="false" aria-label="Evidence Branch 3: Traceability Rule BIS Directive">
+              <span class="branch-num">Branch 03 &bull; Traceability Rule</span>
+              <h3 class="branch-doc-title">BIS Directive HQ/HM/2023</h3>
+              <p class="branch-clause-text">
+                Prohibits the sale of hallmarked gold without HUID and establishes the consumer verification protocol via the official BIS CARE registry.
+              </p>
+            </div>
           </div>
 
-          <div class="step-card">
-            <div class="step-badge">02</div>
-            <div class="step-icon-wrap">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                <path d="M11 8v6"></path>
-                <path d="M8 11h6"></path>
-              </svg>
-            </div>
-            <h3 class="step-title">2. Retrieve verified BIS sources</h3>
-            <p class="step-desc">
-              ChromaDB semantic search retrieves exact chunks from official Gazette notifications, QCO orders, and BIS documentation.
+          <div class="evidence-graph-hint" aria-hidden="true">
+            <span class="hint-dot">&bull;</span>
+            <span>Hover, focus, or tap any branch card to isolate its evidentiary connection</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 5. GROUNDED RESPONSE ================= -->
+    <section id="grounded-response" class="editorial-section" aria-labelledby="response-heading">
+      <div class="section-container">
+        <div class="section-header">
+          <span class="section-eyebrow">Traceable Synthesis</span>
+          <h2 id="response-heading" class="section-title">Every Assertion Has an Address</h2>
+          <p class="section-subtext">
+            Synthesized responses cite source documents directly through inline citation numbers [01][02]. Citations are matched on the server from retrieved chunks to prevent fabricated metadata.
+          </p>
+        </div>
+
+        <div class="grounded-response-layout" aria-label="Grounded response demonstration card">
+          <div class="grounded-card-query">
+            <span class="grounded-query-label">Question:</span>
+            <span>Does Scheme-I (ISI Mark) or Scheme-II (CRS) apply to mobile phone chargers?</span>
+          </div>
+
+          <div class="grounded-response-body">
+            <p>
+              Mobile phone adapters and chargers fall strictly under <strong>Scheme-II (Compulsory Registration Scheme / CRS)</strong> <span class="citation-ref" tabindex="0" role="button" aria-label="Citation [01] — view matching source" title="Citation 01">[01]</span>, not Scheme-I ISI factory marking <span class="citation-ref" tabindex="0" role="button" aria-label="Citation [02] — view matching source" title="Citation 02">[02]</span>.
+            </p>
+            <p>
+              Under Scheme-II (CRS), manufacturers are granted registration based on self-declaration of conformity backed by safety testing reports from BIS-recognized laboratories conforming to <strong>IS 13252 (Part 1):2010</strong> <span class="citation-ref" tabindex="0" role="button" aria-label="Citation [01] — view matching source" title="Citation 01">[01]</span>. Unlike Scheme-I, CRS registration does not require pre-certification factory audits or surprise plant inspections prior to approval <span class="citation-ref" tabindex="0" role="button" aria-label="Citation [02] — view matching source" title="Citation 02">[02]</span>.
             </p>
           </div>
 
-          <div class="step-connector" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="9 18 15 12 9 6"></polyline>
-            </svg>
-          </div>
-
-          <div class="step-card">
-            <div class="step-badge">03</div>
-            <div class="step-icon-wrap">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <div class="grounded-citations-drawer">
+            <div class="drawer-header">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14" aria-hidden="true">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                 <polyline points="14 2 14 8 20 8"></polyline>
-                <line x1="16" y1="13" x2="8" y2="13"></line>
-                <line x1="16" y1="17" x2="8" y2="17"></line>
-                <polyline points="10 9 9 9 8 9"></polyline>
               </svg>
+              <span>Resolved Statutory Citations</span>
             </div>
-            <h3 class="step-title">3. Grounded answer with citations</h3>
-            <p class="step-desc">
-              Synthesized response directly cites official reference standards and clauses. If out of scope, the assistant explicitly declines to guess.
-            </p>
+            <div class="drawer-item">
+              <span class="citation-ref">[01]</span>
+              <span><strong>CRS Scheme Regulation:</strong> Electronics &amp; IT Goods Order, Gazette S.O. 2357(E), Schedule Item 1 (Power Adapters).</span>
+            </div>
+            <div class="drawer-item">
+              <span class="citation-ref">[02]</span>
+              <span><strong>BIS Guidance Document:</strong> Comparative Guide on Scheme-I (Factory Certification) vs. Scheme-II (Registration).</span>
+            </div>
           </div>
-        </div>
 
-        <div class="section-cta-wrap">
-          <a href="how-it-works.html" class="btn btn-secondary">See how BISure works &rarr;</a>
+          <div class="grounded-footer-note">
+            Answers are grounded in curated statutory documents. Users should refer to official Gazette publications for formal legal proceedings.
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- ================= WHO BISURE IS FOR (COMPACT PREVIEW) ================= -->
-    <section id="who-bisure-is-for" class="who-bisure-section" aria-labelledby="who-heading">
+    <!-- ================= 6. SAFETY FALLBACK ================= -->
+    <section id="safety-fallback" class="editorial-section" aria-labelledby="fallback-heading">
       <div class="section-container">
         <div class="section-header">
-          <span class="section-eyebrow">Use Cases</span>
-          <h2 id="who-heading" class="section-title">Who BISure Is For</h2>
+          <span class="section-eyebrow">Integrity &amp; Boundaries</span>
+          <h2 id="fallback-heading" class="section-title">Refusing to Guess When Evidence Is Insufficient</h2>
           <p class="section-subtext">
-            Tailored regulatory clarity for stakeholders navigating Indian Standards, mandatory certification, and product verification.
+            When available evidence is insufficient, BISure should not present uncertainty as certainty. When a query references non-mandatory standards or falls outside the curated corpus, the assistant explicitly declines to guess.
           </p>
         </div>
 
-        <div class="persona-grid">
-          <!-- Card 1: Consumers -->
-          <div class="feature-card">
-            <div class="feature-card-header">
-              <div class="card-icon card-icon-gold">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                </svg>
-              </div>
-              <div class="feature-card-meta">
-                <h3 class="feature-card-title">Consumers</h3>
-                <span class="feature-badge">Verify Products</span>
-              </div>
+        <div class="fallback-canvas" aria-label="Evidence support meter and decline demonstration">
+          <div class="fallback-meter-wrap">
+            <div class="meter-header">
+              <span class="meter-title">Evidence Support Meter</span>
+              <span class="meter-score">22% &bull; Insufficient Context</span>
             </div>
-            <p class="feature-card-desc">
-              Confirm authentic ISI marks, check 7-digit CML license validity, and verify gold hallmarking purity standards.
-            </p>
+            <div class="meter-track" role="progressbar" aria-valuenow="22" aria-valuemin="0" aria-valuemax="100" aria-label="Corpus evidence support level">
+              <div class="meter-fill"></div>
+              <div class="meter-threshold-marker" title="Retrieval Acceptance Threshold (35%)"></div>
+            </div>
+            <div class="meter-annotation">
+              <span>Candidate Match: 0.22</span>
+              <span>Minimum Acceptance Threshold: 0.35</span>
+            </div>
           </div>
 
-          <!-- Card 2: Manufacturers -->
-          <div class="feature-card">
-            <div class="feature-card-header">
-              <div class="card-icon card-icon-navy">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                  <path d="M2 20h20"></path>
-                  <path d="M5 20V8l5 4V8l5 4V4h5v16"></path>
-                </svg>
-              </div>
-              <div class="feature-card-meta">
-                <h3 class="feature-card-title">Manufacturers</h3>
-                <span class="feature-badge">Check Requirements</span>
-              </div>
+          <div class="fallback-decline-card">
+            <div class="decline-header">
+              <span class="decline-badge">Explicit Scope Boundary</span>
+              <span style="font-size: var(--font-size-xs); color: var(--color-text-muted);">Question: "What is the mandatory ISI standard for handcrafted wooden dining chairs?"</span>
             </div>
-            <p class="feature-card-desc">
-              Review mandatory QCO compliance, determine certification applicability, and clarify Scheme-I versus Scheme-II scope.
+            <p class="decline-body">
+              <strong>Transparent Decline Behavior:</strong> No Quality Control Order currently mandates compulsory ISI certification or CRS registration for handcrafted wooden furniture under current BIS regulations.
             </p>
-          </div>
-
-          <!-- Card 3: Retailers -->
-          <div class="feature-card">
-            <div class="feature-card-header">
-              <div class="card-icon card-icon-teal">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                  <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-                  <line x1="3" y1="6" x2="21" y2="6"></line>
-                  <path d="M16 10a4 4 0 0 1-8 0"></path>
-                </svg>
-              </div>
-              <div class="feature-card-meta">
-                <h3 class="feature-card-title">Retailers</h3>
-                <span class="feature-badge">Validate Markings</span>
-              </div>
+            <div class="decline-quote">
+              "Under current statutory orders, handcrafted wooden furniture is not covered by a mandatory Quality Control Order (QCO). BISure focuses strictly on mandatory standards and will not guess. For voluntary standards or technical specifications, please consult bis.gov.in."
             </div>
-            <p class="feature-card-desc">
-              Ensure stocked inventory carries valid mandatory certification markings and cross-check supplier CML details.
-            </p>
           </div>
-        </div>
-
-        <div class="section-cta-wrap">
-          <a href="about.html" class="btn btn-secondary">Learn more about who BISure is for &rarr;</a>
         </div>
       </div>
     </section>
 
-    <!-- ================= DEFINED SCOPE (COMPACT PREVIEW) ================= -->
-    <section id="scope" class="about-section" aria-labelledby="scope-heading">
+    <!-- ================= 7. TRUST PRINCIPLES ================= -->
+    <section id="principles" class="editorial-section" aria-labelledby="principles-heading">
       <div class="section-container">
         <div class="section-header">
-          <span class="section-eyebrow">Project Specifications</span>
-          <h2 id="scope-heading" class="section-title">Defined Scope</h2>
+          <span class="section-eyebrow">Architecture Guarantees</span>
+          <h2 id="principles-heading" class="section-title">Principles of Grounded Intelligence</h2>
           <p class="section-subtext">
-            Transparent boundaries defining covered regulatory domains and intentionally deferred capabilities.
+            Built for regulatory verification where accuracy matters and unsubstantiated guesses carry legal risks.
           </p>
         </div>
 
-        <div class="scope-columns">
-          <!-- In-Scope Card -->
-          <div class="scope-card scope-in">
-            <div class="scope-card-header">
-              <div class="scope-icon-wrap in-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-              </div>
-              <div>
-                <h3 class="scope-card-title">What BISure Covers (In-Scope)</h3>
-                <span class="scope-badge badge-green">Actively Supported</span>
-              </div>
-            </div>
-            <ul class="scope-list">
-              <li>
-                <svg class="list-bullet-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-                <span><strong>Mandatory QCOs:</strong> Identification of products requiring compulsory ISI marking prior to sale.</span>
-              </li>
-              <li>
-                <svg class="list-bullet-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-                <span><strong>Gold Hallmarking:</strong> Legal purity carats, 6-digit HUID verification, and jeweler compliance steps.</span>
-              </li>
-              <li>
-                <svg class="list-bullet-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-                <span><strong>Scheme Disambiguation:</strong> Clear contrast between Scheme-I (ISI mark) and Scheme-II (CRS for electronics).</span>
-              </li>
-              <li>
-                <svg class="list-bullet-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-                <span><strong>License Validity:</strong> 7-digit CML license number format, validity checks, and consumer verification guidance.</span>
-              </li>
-            </ul>
+        <div class="trust-principles-grid">
+          <div class="principle-block">
+            <div class="principle-number">01</div>
+            <h3 class="principle-title">Source-Grounded</h3>
+            <p class="principle-text">
+              Every regulatory statement is synthesized from numbered, retrieved chunks of Gazette Notifications, Quality Control Orders, or Indian Standards. Numbered inline citations map directly to retrieved source documents.
+            </p>
           </div>
 
-          <!-- Out-of-Scope Card -->
-          <div class="scope-card scope-out">
-            <div class="scope-card-header">
-              <div class="scope-icon-wrap out-icon">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line>
-                </svg>
-              </div>
-              <div>
-                <h3 class="scope-card-title">Out of Scope (Intentionally Deferred)</h3>
-                <span class="scope-badge badge-neutral">Future Roadmap</span>
-              </div>
+          <div class="principle-block">
+            <div class="principle-number">02</div>
+            <h3 class="principle-title">Transparent</h3>
+            <p class="principle-text">
+              We surface the document title, source category, and retrieved clause references alongside every answer. You can independently evaluate the underlying statutory text without placing blind faith in a black-box model.
+            </p>
+          </div>
+
+          <div class="principle-block">
+            <div class="principle-number">03</div>
+            <h3 class="principle-title">Honest About Uncertainty</h3>
+            <p class="principle-text">
+              When an inquiry addresses voluntary standards, draft proposals, or matters outside the curated corpus, BISure explicitly declines to answer rather than fabricating plausible conjectures.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 8. BISURE INSIDE BISURE ================= -->
+    <section id="system-trace" class="editorial-section" aria-labelledby="trace-heading">
+      <div class="section-container">
+        <div class="section-header">
+          <span class="section-eyebrow">System Trace</span>
+          <h2 id="trace-heading" class="section-title">The Architecture at Work</h2>
+          <p class="section-subtext">
+            An interactive step-by-step verification trace demonstrating how an inquiry moves through the RAG pipeline end-to-end.
+          </p>
+        </div>
+
+        <!-- Chapter 8 Simulation Toolbar -->
+        <div class="trace-simulation-toolbar">
+          <div class="trace-scenario-selector" role="tablist" aria-label="Simulation Scenarios">
+            <button type="button" class="scenario-btn is-active" data-scenario="gold" role="tab" aria-selected="true" id="tab-scenario-gold">
+              <span>01 &bull; Gold Hallmarking (IS 1417)</span>
+            </button>
+            <button type="button" class="scenario-btn" data-scenario="electronics" role="tab" aria-selected="false" id="tab-scenario-electronics">
+              <span>02 &bull; Electronics CRS (IS 13252)</span>
+            </button>
+          </div>
+
+          <div class="trace-actions">
+            <button type="button" class="btn btn-secondary btn-trace-replay" id="btn-replay-trace" aria-label="Step through simulated pipeline verification">
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              <span>Step Through Trace</span>
+            </button>
+            <div class="trace-offline-badge" title="Controlled offline demonstration without network calls">
+              <span class="offline-dot" aria-hidden="true"></span>
+              <span>Deterministic Trace &bull; 0 API Calls</span>
             </div>
-            <ul class="scope-list">
-              <li>
-                <svg class="list-bullet-icon out-bullet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-                <span><strong>Paid Standard Downloads:</strong> Full copyrighted Indian Standard PDFs sold by BIS.</span>
-              </li>
-              <li>
-                <svg class="list-bullet-icon out-bullet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-                <span><strong>Physical Barcode Scanning:</strong> Camera-based package barcode scanning via mobile client.</span>
-              </li>
-              <li>
-                <svg class="list-bullet-icon out-bullet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-                <span><strong>Direct Legal Complaint Filing:</strong> Lodging formal statutory complaints (directed to BIS CARE portal).</span>
-              </li>
-              <li>
-                <svg class="list-bullet-icon out-bullet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-                <span><strong>Testing Lab Booking:</strong> Commercial test lab scheduling and fee transactions.</span>
-              </li>
-            </ul>
           </div>
         </div>
 
-        <div class="section-cta-wrap">
-          <a href="about.html" class="btn btn-secondary">Explore full scope &amp; project details &rarr;</a>
+        <div class="trace-board" aria-label="End-to-end RAG architecture trace">
+          <div class="trace-steps-list">
+            <!-- Step 1 -->
+            <div class="trace-step-item">
+              <span class="trace-step-marker">01 &bull; User Inquiry</span>
+              <div class="trace-step-detail">
+                <div class="trace-step-name">Query Processing</div>
+                <p class="trace-step-text">"Can a jeweler sell 20-carat gold jewellery with an authentic BIS hallmark?"</p>
+              </div>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="trace-step-item">
+              <span class="trace-step-marker">02 &bull; Vector Search</span>
+              <div class="trace-step-detail">
+                <div class="trace-step-name">ChromaDB Retrieval</div>
+                <p class="trace-step-text">Query embedded via sentence-transformers; top-k semantic search matches IS 1417:2016 (similarity 0.91) and Hallmarking Directive 2021 (similarity 0.86).</p>
+              </div>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="trace-step-item">
+              <span class="trace-step-marker">03 &bull; Source Discovery</span>
+              <div class="trace-step-detail">
+                <div class="trace-step-name">Corpus Chunk Assembly</div>
+                <p class="trace-step-text">Retrieved context identifies six recognized purity grades: 14K (585), 18K (750), 20K (833), 22K (916), 23K (958), and 24K (999).</p>
+              </div>
+            </div>
+
+            <!-- Step 4 -->
+            <div class="trace-step-item">
+              <span class="trace-step-marker">04 &bull; Evidence Connection</span>
+              <div class="trace-step-detail">
+                <div class="trace-step-name">Constraint Verification</div>
+                <p class="trace-step-text">Clause 4.1.2 explicitly validates 20K (833 fineness) under the amended hallmarking directives, confirming applicability alongside 22K and 18K.</p>
+              </div>
+            </div>
+
+            <!-- Step 5 -->
+            <div class="trace-step-item">
+              <span class="trace-step-marker">05 &bull; Grounded Output</span>
+              <div class="trace-step-detail">
+                <div class="trace-step-name">Synthesized Response</div>
+                <p class="trace-step-text">"Yes. Under IS 1417 (as amended in 2021), 20-carat gold (833 fineness) is officially recognized for mandatory hallmarking alongside 14K, 18K, 22K, 23K, and 24K [01]."</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 9. FINAL CTA ================= -->
+    <section id="cta" class="editorial-section section-final-cta" aria-labelledby="cta-heading">
+      <div class="section-container">
+        <div class="final-cta-content">
+          <span class="section-eyebrow">Ready to Verify</span>
+          <h2 id="cta-heading" class="final-cta-title">
+            The answer is only the beginning.<br />Know what supports it.
+          </h2>
+          <p class="final-cta-desc">
+            Test any question about mandatory Indian Standards, Quality Control Orders, or gold hallmarking rules in the live assistant.
+          </p>
+          <div class="hero-actions-group" style="justify-content: center;">
+            <a href="chat.html" class="btn btn-primary btn-hero-primary">
+              <span>Launch Interactive Assistant</span>
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </a>
+            <a href="how-it-works.html" class="btn btn-secondary btn-hero-secondary">
+              <span>Read Architecture Overview</span>
+              <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <polyline points="19 12 12 19 5 12"></polyline>
+              </svg>
+            </a>
+          </div>
         </div>
       </div>
     </section>
@@ -553,5 +713,6 @@
 
   <script src="config.js"></script>
   <script src="common.js"></script>
+  <script src="motion.js"></script>
 </body>
 </html>
