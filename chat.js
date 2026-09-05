@@ -1,14 +1,14 @@
 // chat.js — Dedicated Chat Engine for BISure (chat.html)
 // Handles RAG conversation state, streaming responses, evidence rendering, error recovery, and URL prompt prefilling.
 
-// --- DOM References ---
-const chatForm = document.getElementById("chat-form");
-const userInput = document.getElementById("user-input");
-const sendButton = document.getElementById("send-button");
-const messageList = document.getElementById("message-list");
-const emptyState = document.getElementById("empty-state");
-const coldStartBanner = document.getElementById("cold-start-banner");
-const newChatBtn = document.getElementById("new-chat-btn");
+// --- DOM References (dynamically bound via initChat) ---
+let chatForm = null;
+let userInput = null;
+let sendButton = null;
+let messageList = null;
+let emptyState = null;
+let coldStartBanner = null;
+let newChatBtn = null;
 
 // --- Runtime State ---
 let abortController = null;
@@ -17,6 +17,7 @@ let hasActiveError = false;
 let lastFailedQuery = null;
 let hasReceivedFirstResponse = false;
 let coldStartTimer = null;
+let isNavigatingAway = false;
 
 // Only stores confirmed turns: [{ role: "user" | "assistant", content: string }]
 const conversationHistory = [];
@@ -41,33 +42,151 @@ function formatAnswer(text) {
 
   clean = clean.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
   clean = clean.replace(/`([^`]+)`/g, "<code>$1</code>");
+  clean = clean.replace(/\[(\d+)\]/g, (match, digits) => {
+    const idx = parseInt(digits, 10);
+    return `<button type="button" class="citation-marker" data-citation-index="${idx}">${match}</button>`;
+  });
 
   const lines = clean.split("\n");
   const output = [];
   let inList = false;
+  let inOrderedList = false;
 
-  for (const line of lines) {
+  function closeLists() {
+    if (inList) {
+      output.push("</ul>");
+      inList = false;
+    }
+    if (inOrderedList) {
+      output.push("</ol>");
+      inOrderedList = false;
+    }
+  }
+
+  function parseTableRow(line) {
+    const t = line.trim();
+    if (!t.startsWith("|") || !t.endsWith("|") || t.length < 2) return null;
+    const inner = t.slice(1, -1);
+    return inner.split("|").map((cell) => cell.trim());
+  }
+
+  function isSeparatorRow(cells) {
+    if (!cells || cells.length === 0) return false;
+    return cells.every((c) => /^:?-+:?$/.test(c));
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
     const trimmed = line.trim();
-    const isBullet = /^[*-]\s+(.+)/.test(trimmed);
 
+    // Check for Table block (requires header row and separator row with matching column count)
+    const headerCells = parseTableRow(trimmed);
+    if (headerCells && headerCells.length >= 1 && i + 1 < lines.length) {
+      const sepCells = parseTableRow(lines[i + 1]);
+      if (sepCells && isSeparatorRow(sepCells) && sepCells.length === headerCells.length) {
+        let j = i + 2;
+        const bodyRows = [];
+        let isRagged = false;
+
+        while (j < lines.length) {
+          const candidate = lines[j].trim();
+          if (candidate.startsWith("|") && candidate.endsWith("|") && candidate.length >= 2) {
+            const rowCells = parseTableRow(candidate);
+            if (rowCells.length !== headerCells.length) {
+              isRagged = true;
+            }
+            bodyRows.push(isRagged ? candidate : rowCells);
+            j++;
+          } else {
+            break;
+          }
+        }
+
+        if (isRagged) {
+          // Defensive fallback: render raw lines inside <p>
+          closeLists();
+          for (let k = i; k < j; k++) {
+            const rawTrimmed = lines[k].trim();
+            if (rawTrimmed.length > 0) {
+              output.push(`<p>${rawTrimmed}</p>`);
+            }
+          }
+        } else {
+          closeLists();
+          let tableHtml = '<div class="table-container"><table class="chat-table"><thead><tr>';
+          for (const cell of headerCells) {
+            tableHtml += `<th>${cell}</th>`;
+          }
+          tableHtml += '</tr></thead><tbody>';
+          for (const row of bodyRows) {
+            tableHtml += '<tr>';
+            for (const cell of row) {
+              tableHtml += `<td>${cell}</td>`;
+            }
+            tableHtml += '</tr>';
+          }
+          tableHtml += '</tbody></table></div>';
+          output.push(tableHtml);
+        }
+
+        i = j - 1;
+        continue;
+      }
+    }
+
+    // Check for Headings (### -> <h4>, #### -> <h5>)
+    const h5Match = /^####\s+(.+)$/.exec(trimmed);
+    if (h5Match) {
+      closeLists();
+      output.push(`<h5>${h5Match[1]}</h5>`);
+      continue;
+    }
+
+    const h4Match = /^###\s+(.+)$/.exec(trimmed);
+    if (h4Match) {
+      closeLists();
+      output.push(`<h4>${h4Match[1]}</h4>`);
+      continue;
+    }
+
+    // Check for Unordered List
+    const isBullet = /^[*-]\s+(.+)/.test(trimmed);
     if (isBullet) {
+      if (inOrderedList) {
+        output.push("</ol>");
+        inOrderedList = false;
+      }
       if (!inList) {
         output.push("<ul>");
         inList = true;
       }
       output.push(`<li>${trimmed.replace(/^[*-]\s+/, "")}</li>`);
-    } else {
+      continue;
+    }
+
+    // Check for Ordered List
+    const isOrdered = /^\d+\.\s+(.+)/.test(trimmed);
+    if (isOrdered) {
       if (inList) {
         output.push("</ul>");
         inList = false;
       }
-      if (trimmed.length > 0) {
-        output.push(`<p>${trimmed}</p>`);
+      if (!inOrderedList) {
+        output.push("<ol>");
+        inOrderedList = true;
       }
+      output.push(`<li>${trimmed.replace(/^\d+\.\s+/, "")}</li>`);
+      continue;
+    }
+
+    // Normal non-list line
+    closeLists();
+    if (trimmed.length > 0) {
+      output.push(`<p>${trimmed}</p>`);
     }
   }
 
-  if (inList) output.push("</ul>");
+  closeLists();
   return output.join("");
 }
 
@@ -206,6 +325,7 @@ function renderSources(container, sources) {
   sources.forEach((src, idx) => {
     const card = document.createElement("div");
     card.className = "evidence-card";
+    card.dataset.citationIndex = String(idx + 1);
 
     const cardHeader = document.createElement("div");
     cardHeader.className = "evidence-card-header";
@@ -240,6 +360,120 @@ function renderSources(container, sources) {
 
   details.appendChild(cardList);
   container.appendChild(details);
+  wireCitationInteractions(container);
+}
+
+// --- Citation Marker & Evidence Card Interactive Cross-Referencing ---
+const activeCardPulseTimers = new WeakMap();
+
+function isReducedMotionActive() {
+  if (window.BISureMotion && window.BISureMotion.prefersReducedMotion) {
+    return window.BISureMotion.prefersReducedMotion.matches();
+  }
+  if (typeof window !== "undefined" && window.matchMedia) {
+    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  }
+  return false;
+}
+
+function wireCitationInteractions(messageContainer) {
+  if (!messageContainer) return;
+
+  const markers = messageContainer.querySelectorAll(".citation-marker");
+  if (markers.length === 0) return;
+
+  markers.forEach((marker) => {
+    if (marker.dataset.citationBound === "true") return;
+    marker.dataset.citationBound = "true";
+
+    const index = marker.dataset.citationIndex;
+    const matchingCard = messageContainer.querySelector(
+      `.evidence-card[data-citation-index="${index}"]`
+    );
+
+    if (!matchingCard) {
+      // Graceful no-op for orphaned/unmatched citation marker
+      marker.classList.add("is-unmatched");
+      marker.setAttribute("aria-disabled", "true");
+      marker.setAttribute("title", `Source [${index}] not found in evidence list`);
+      marker.tabIndex = -1;
+      return;
+    }
+
+    // Click / Enter / Space activation (buttons trigger click on Enter/Space natively)
+    marker.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      // 1. Open evidence details if closed
+      const details = messageContainer.querySelector(".assistant-evidence-block");
+      if (details && !details.open) {
+        details.open = true;
+      }
+
+      // 2. Scroll matching card into view respecting prefers-reduced-motion
+      const scrollBehavior = isReducedMotionActive() ? "auto" : "smooth";
+      matchingCard.scrollIntoView({
+        behavior: scrollBehavior,
+        block: "nearest"
+      });
+
+      // 3. Apply temporary highlight/pulse visual state (~1.8s)
+      matchingCard.classList.add("citation-active-pulse");
+      if (activeCardPulseTimers.has(matchingCard)) {
+        clearTimeout(activeCardPulseTimers.get(matchingCard));
+      }
+      const timerId = setTimeout(() => {
+        matchingCard.classList.remove("citation-active-pulse");
+        activeCardPulseTimers.delete(matchingCard);
+      }, 1800);
+      activeCardPulseTimers.set(matchingCard, timerId);
+    });
+
+    // Hover preview: light visual cue, no scroll, no auto-opening
+    marker.addEventListener("mouseenter", () => {
+      matchingCard.classList.add("citation-hover");
+    });
+    marker.addEventListener("mouseleave", () => {
+      matchingCard.classList.remove("citation-hover");
+    });
+
+    // Focus / blur preview for keyboard navigation
+    marker.addEventListener("focus", () => {
+      matchingCard.classList.add("citation-hover");
+    });
+    marker.addEventListener("blur", () => {
+      matchingCard.classList.remove("citation-hover");
+    });
+  });
+}
+
+// --- Toast Feedback Helper ---
+let toastElement = null;
+let toastTimeoutId = null;
+
+function showToast(message = "Copied to clipboard") {
+  if (!toastElement) {
+    toastElement = document.createElement("div");
+    toastElement.className = "clipboard-toast";
+    toastElement.setAttribute("role", "status");
+    toastElement.setAttribute("aria-live", "polite");
+    document.body.appendChild(toastElement);
+  }
+
+  toastElement.textContent = message;
+  toastElement.classList.add("is-visible");
+
+  if (toastTimeoutId) {
+    clearTimeout(toastTimeoutId);
+    toastTimeoutId = null;
+  }
+
+  toastTimeoutId = setTimeout(() => {
+    if (toastElement) {
+      toastElement.classList.remove("is-visible");
+    }
+    toastTimeoutId = null;
+  }, 2000);
 }
 
 function renderMessageActions(container, rawText, role) {
@@ -262,6 +496,7 @@ function renderMessageActions(container, rawText, role) {
       await navigator.clipboard.writeText(rawText);
       copyBtn.classList.add("action-success");
       setTimeout(() => copyBtn.classList.remove("action-success"), 1500);
+      showToast("Copied to clipboard");
     } catch (e) {
       console.warn("Clipboard copy failed:", e);
     }
@@ -347,6 +582,8 @@ function appendMessage(role, textContent, sources = []) {
 
     if (sources && sources.length > 0) {
       renderSources(wrapper, sources);
+    } else {
+      wireCitationInteractions(wrapper);
     }
   }
 
@@ -468,6 +705,36 @@ function appendRetryableError(errorMessage) {
   }
 }
 
+// --- Session ID Management (DESIGN_TREE.md Contract) ---
+const SESSION_STORAGE_KEY = "bisure_session_id";
+
+function getOrCreateSessionId() {
+  try {
+    let sessionId = sessionStorage.getItem(SESSION_STORAGE_KEY);
+    if (sessionId && typeof sessionId === "string" && sessionId.trim()) {
+      return sessionId;
+    }
+
+    if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+      sessionId = crypto.randomUUID();
+    } else {
+      sessionId = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
+        const r = (Math.random() * 16) | 0;
+        const v = c === "x" ? r : (r & 0x3) | 0x8;
+        return v.toString(16);
+      });
+    }
+
+    sessionStorage.setItem(SESSION_STORAGE_KEY, sessionId);
+    return sessionId;
+  } catch {
+    if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+      return crypto.randomUUID();
+    }
+    return "session-" + Date.now() + "-" + Math.random().toString(36).substring(2, 9);
+  }
+}
+
 // --- Transports ---
 async function requestBatch(query) {
   abortController = new AbortController();
@@ -480,6 +747,7 @@ async function requestBatch(query) {
   const payload = {
     query,
     history: conversationHistory,
+    session_id: getOrCreateSessionId(),
   };
 
   let response;
@@ -523,6 +791,7 @@ async function requestStream(query) {
   const payload = {
     query,
     history: conversationHistory,
+    session_id: getOrCreateSessionId(),
   };
 
   const response = await fetch(window.APP_CONFIG.STREAM_URL, {
@@ -601,6 +870,8 @@ async function requestStream(query) {
 
     if (extractedSources.length > 0 && assistantBubble) {
       renderSources(assistantBubble, extractedSources);
+    } else if (assistantBubble) {
+      wireCitationInteractions(assistantBubble);
     }
     if (assistantBubble) {
       renderMessageActions(assistantBubble, finalAnswer, "assistant");
@@ -637,6 +908,10 @@ async function executeTurn(query, isNewInput = true) {
     }
     lastFailedQuery = null;
   } catch (err) {
+    if (isNavigatingAway) {
+      // Clean unload: user navigated away while request was in-flight. No exception or banner needed.
+      return;
+    }
     hideTypingIndicator();
     let msg = err.message;
     const timeoutSeconds = window.APP_CONFIG ? Math.round(window.APP_CONFIG.REQUEST_TIMEOUT_MS / 1000) : 30;
@@ -706,50 +981,106 @@ function handleUrlPromptParam() {
   }
 }
 
-// --- Listeners & Wiring ---
-if (chatForm) {
-  chatForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    if (hasActiveError || !userInput) return;
-    const query = userInput.value.trim();
-    executeTurn(query, true);
-  });
-}
+// --- Lifecycle Management for Barba.js & Direct Page Load ---
+function initChat(container) {
+  const root = container || document;
 
-if (emptyState) {
-  emptyState.addEventListener("click", (event) => {
-    if (isWaitingForResponse || hasActiveError || !userInput) return;
-    const card = event.target.closest(".category-card");
-    if (!card) return;
-    const prompt = card.getAttribute("data-prompt");
-    if (prompt) {
-      userInput.value = prompt;
-      autoResizeTextarea(userInput);
-      executeTurn(prompt, true);
-    }
-  });
-}
+  chatForm = root.querySelector("#chat-form") || document.getElementById("chat-form");
+  userInput = root.querySelector("#user-input") || document.getElementById("user-input");
+  sendButton = root.querySelector("#send-button") || document.getElementById("send-button");
+  messageList = root.querySelector("#message-list") || document.getElementById("message-list");
+  emptyState = root.querySelector("#empty-state") || document.getElementById("empty-state");
+  coldStartBanner = root.querySelector("#cold-start-banner") || document.getElementById("cold-start-banner");
+  newChatBtn = root.querySelector("#new-chat-btn") || document.getElementById("new-chat-btn");
 
-if (newChatBtn) {
-  newChatBtn.addEventListener("click", resetConversation);
-}
+  if (!chatForm && !userInput) return;
 
-if (userInput) {
-  userInput.addEventListener("input", () => autoResizeTextarea(userInput));
-
-  userInput.addEventListener("keydown", (event) => {
-    if (event.key === "Enter" && !event.shiftKey) {
+  if (chatForm && !chatForm.dataset.chatBound) {
+    chatForm.dataset.chatBound = "true";
+    chatForm.addEventListener("submit", (event) => {
       event.preventDefault();
-      if (!isWaitingForResponse && !hasActiveError) {
-        const query = userInput.value.trim();
-        executeTurn(query, true);
+      if (hasActiveError || !userInput) return;
+      const query = userInput.value.trim();
+      executeTurn(query, true);
+    });
+  }
+
+  if (emptyState && !emptyState.dataset.chatBound) {
+    emptyState.dataset.chatBound = "true";
+    emptyState.addEventListener("click", (event) => {
+      if (isWaitingForResponse || hasActiveError || !userInput) return;
+      const card = event.target.closest(".category-card");
+      if (!card) return;
+      const prompt = card.getAttribute("data-prompt");
+      if (prompt) {
+        userInput.value = prompt;
+        autoResizeTextarea(userInput);
+        executeTurn(prompt, true);
       }
-    }
-  });
+    });
+  }
+
+  if (newChatBtn && !newChatBtn.dataset.chatBound) {
+    newChatBtn.dataset.chatBound = "true";
+    newChatBtn.addEventListener("click", resetConversation);
+  }
+
+  if (userInput && !userInput.dataset.chatBound) {
+    userInput.dataset.chatBound = "true";
+    userInput.addEventListener("input", () => autoResizeTextarea(userInput));
+
+    userInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        if (!isWaitingForResponse && !hasActiveError) {
+          const query = userInput.value.trim();
+          executeTurn(query, true);
+        }
+      }
+    });
+  }
+
+  if (userInput) {
+    autoResizeTextarea(userInput);
+    handleUrlPromptParam();
+  }
 }
 
-// Bootstrap chat interface
-if (userInput) {
-  autoResizeTextarea(userInput);
-  handleUrlPromptParam();
+function destroyChat() {
+  isNavigatingAway = true;
+  if (abortController) {
+    try {
+      abortController.abort();
+    } catch (_) {}
+    abortController = null;
+  }
+  if (coldStartTimer) {
+    clearTimeout(coldStartTimer);
+    coldStartTimer = null;
+  }
+  isWaitingForResponse = false;
+  hasActiveError = false;
+  setBusy(false);
 }
+
+// Auto-bootstrap on chat.html
+if (typeof document !== "undefined") {
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+      if (document.getElementById("chat-form")) initChat();
+    });
+  } else {
+    if (document.getElementById("chat-form")) initChat();
+  }
+  // Safely clean up in-flight requests and timers on document unload
+  window.addEventListener("pagehide", destroyChat);
+}
+
+// Global interface
+window.BISureChat = {
+  initChat,
+  destroyChat,
+  getOrCreateSessionId,
+  showToast,
+  wireCitationInteractions
+};
