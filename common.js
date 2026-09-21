@@ -2,13 +2,81 @@
 // Handles theme persistence, mobile hamburger menu navigation, and backend service health check.
 
 // --- Theme Management ---
+function getPersistedTheme() {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const urlTheme = params.get("theme");
+    if (urlTheme === "light" || urlTheme === "dark") return urlTheme;
+  } catch (e) {}
+
+  try {
+    if (window.name && window.name.indexOf("bisure_theme:") !== -1) {
+      const match = window.name.match(/bisure_theme:(light|dark)/);
+      if (match) return match[1];
+    }
+  } catch (e) {}
+
+  try {
+    const stored = localStorage.getItem("bisure-theme");
+    if (stored === "light" || stored === "dark") return stored;
+  } catch (e) {}
+
+  try {
+    const cookieMatch = document.cookie.match(/(?:^|;\s*)bisure-theme=(light|dark)/);
+    if (cookieMatch) return cookieMatch[1];
+  } catch (e) {}
+
+  return "dark";
+}
+
+function propagateThemeToLinks(theme) {
+  try {
+    if (window.history && window.history.replaceState) {
+      const url = new URL(window.location.href);
+      url.searchParams.set("theme", theme);
+      window.history.replaceState(null, "", url.toString());
+    }
+  } catch (e) {}
+
+  try {
+    const links = document.querySelectorAll("a[href]");
+    links.forEach((link) => {
+      const href = link.getAttribute("href");
+      if (!href || href.startsWith("#") || href.startsWith("http://") || href.startsWith("https://") || href.startsWith("mailto:")) {
+        return;
+      }
+      try {
+        const targetUrl = new URL(href, window.location.href);
+        targetUrl.searchParams.set("theme", theme);
+        const newHref = href.split("?")[0].split("#")[0] + targetUrl.search + (targetUrl.hash || "");
+        link.setAttribute("href", newHref);
+      } catch (err) {}
+    });
+  } catch (e) {}
+}
+
+function setPersistedTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+
+  try {
+    const baseName = window.name ? window.name.replace(/bisure_theme:(light|dark)/g, "").trim() : "";
+    window.name = (baseName ? baseName + " " : "") + "bisure_theme:" + theme;
+  } catch (e) {}
+
+  try {
+    localStorage.setItem("bisure-theme", theme);
+  } catch (e) {}
+
+  try {
+    document.cookie = "bisure-theme=" + theme + "; path=/; max-age=31536000; SameSite=Lax";
+  } catch (e) {}
+
+  propagateThemeToLinks(theme);
+}
+
 function initializeTheme() {
-  const storedTheme = localStorage.getItem("bisure-theme");
-  if (storedTheme === "light" || storedTheme === "dark") {
-    document.documentElement.setAttribute("data-theme", storedTheme);
-  } else {
-    document.documentElement.setAttribute("data-theme", "dark");
-  }
+  const theme = getPersistedTheme();
+  setPersistedTheme(theme);
 }
 
 function initThemeToggle() {
@@ -16,14 +84,29 @@ function initThemeToggle() {
   if (!themeToggle) return;
 
   themeToggle.addEventListener("click", () => {
-    const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
+    const currentTheme = document.documentElement.getAttribute("data-theme") || "dark";
     const nextTheme = currentTheme === "dark" ? "light" : "dark";
-    document.documentElement.setAttribute("data-theme", nextTheme);
-    localStorage.setItem("bisure-theme", nextTheme);
+    setPersistedTheme(nextTheme);
   });
 }
 
-// Immediately apply theme to prevent flash of unstyled theme
+// Global click capture to ensure dynamic or newly clicked navigation links carry theme
+document.addEventListener("click", (e) => {
+  const anchor = e.target.closest && e.target.closest("a[href]");
+  if (!anchor) return;
+  const href = anchor.getAttribute("href");
+  if (!href || href.startsWith("#") || href.startsWith("http://") || href.startsWith("https://") || href.startsWith("mailto:")) return;
+
+  const currentTheme = document.documentElement.getAttribute("data-theme") || "dark";
+  try {
+    const targetUrl = new URL(href, window.location.href);
+    targetUrl.searchParams.set("theme", currentTheme);
+    const newHref = href.split("?")[0].split("#")[0] + targetUrl.search + (targetUrl.hash || "");
+    anchor.setAttribute("href", newHref);
+  } catch (err) {}
+}, true);
+
+// Immediately apply theme
 initializeTheme();
 
 // --- Mobile Hamburger Menu Navigation ---
@@ -136,6 +219,7 @@ function initNavToggle() {
 // --- Backend Health Status Indicator ---
 function setConnectionStatus(state) {
   const connectionStatus = document.getElementById("connection-status");
+  const heroPrimaryBtn = document.querySelector(".btn-hero-primary");
   if (!connectionStatus) return;
 
   const label = connectionStatus.querySelector(".status-label");
@@ -144,10 +228,22 @@ function setConnectionStatus(state) {
   if (state === "online") {
     connectionStatus.title = "Local BISure service is available";
     if (label) label.textContent = "Service online";
+    document.body.classList.add("service-is-online");
+    document.body.classList.remove("service-is-offline");
+    if (heroPrimaryBtn) {
+      heroPrimaryBtn.removeAttribute("title");
+      heroPrimaryBtn.removeAttribute("aria-describedby");
+    }
   } else if (state === "offline") {
     connectionStatus.classList.add("is-offline");
     connectionStatus.title = "Start the local BISure backend to ask questions";
     if (label) label.textContent = "Service offline";
+    document.body.classList.add("service-is-offline");
+    document.body.classList.remove("service-is-online");
+    if (heroPrimaryBtn) {
+      heroPrimaryBtn.setAttribute("title", "Local service offline — start backend at localhost:8000 to query live assistant");
+      heroPrimaryBtn.setAttribute("aria-describedby", "connection-status");
+    }
   } else {
     connectionStatus.classList.add("is-checking");
     connectionStatus.title = "Checking the local BISure service";
@@ -196,9 +292,10 @@ function updateActiveNav(namespace) {
 
   const targetHref = NAMESPACE_HREF_MAP[namespace];
   navLinks.querySelectorAll(".nav-link").forEach((link) => {
-    const href = link.getAttribute("href") || "";
+    const rawHref = link.getAttribute("href") || "";
+    const cleanHref = rawHref.split("?")[0].split("#")[0];
     // Match either the full href or ending filename
-    const isMatch = targetHref && (href === targetHref || href.endsWith("/" + targetHref));
+    const isMatch = targetHref && (cleanHref === targetHref || cleanHref.endsWith("/" + targetHref));
     if (isMatch) {
       link.classList.add("nav-active");
       link.setAttribute("aria-current", "page");
