@@ -943,25 +943,34 @@
 
         if (reduced) {
           stepItems.forEach(function (item) {
-            item.classList.add("step-active");
-            item.classList.remove("step-pending");
+            item.classList.add("step-completed", "step-active");
+            item.classList.remove("step-current", "step-pending");
           });
           return;
         }
 
         // Reset steps to pending state
         stepItems.forEach(function (item) {
-          item.classList.remove("step-active");
+          item.classList.remove("step-current", "step-completed", "step-active");
           item.classList.add("step-pending");
         });
 
         let stepIndex = 0;
         function activateNext() {
           if (stepIndex < stepItems.length) {
-            stepItems[stepIndex].classList.add("step-active");
+            if (stepIndex > 0) {
+              stepItems[stepIndex - 1].classList.remove("step-current");
+              stepItems[stepIndex - 1].classList.add("step-completed");
+            }
+            stepItems[stepIndex].classList.add("step-current", "step-active");
             stepItems[stepIndex].classList.remove("step-pending");
             stepIndex++;
-            simTimer = setTimeout(activateNext, 340);
+            simTimer = setTimeout(activateNext, 380);
+          } else {
+            if (stepItems.length > 0) {
+              stepItems[stepItems.length - 1].classList.remove("step-current");
+              stepItems[stepItems.length - 1].classList.add("step-completed");
+            }
           }
         }
 
