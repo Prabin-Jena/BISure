@@ -5,6 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Assistant — BISure Standards Assistant</title>
   <link rel="stylesheet" href="style.css" />
+  <script>
+    // Blocking theme init — must run before first paint to prevent flash-of-wrong-theme.
+    (function () {
+      var theme = "dark";
+      try {
+        var params = new URLSearchParams(window.location.search);
+        var q = params.get("theme");
+        if (q === "light" || q === "dark") theme = q;
+      } catch (e) {}
+
+      if (theme === "dark") {
+        try {
+          if (window.name && window.name.indexOf("bisure_theme:") !== -1) {
+            var m = window.name.match(/bisure_theme:(light|dark)/);
+            if (m) theme = m[1];
+          }
+        } catch (e) {}
+      }
+
+      if (theme === "dark") {
+        try {
+          var s = localStorage.getItem("bisure-theme");
+          if (s === "light" || s === "dark") theme = s;
+        } catch (e) {}
+      }
+
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
 </head>
 <body>
   <!-- ================= STICKY TOP NAV ================= -->
@@ -26,7 +55,7 @@
         <a href="index.html" class="nav-link">Home</a>
         <a href="features.html" class="nav-link">Features</a>
         <a href="how-it-works.html" class="nav-link">How It Works</a>
-        <a href="chat.html" class="nav-link nav-link-highlight nav-active" aria-current="page">Assistant</a>
+        <a href="chat.html" class="nav-link nav-active" aria-current="page">Assistant</a>
         <a href="about.html" class="nav-link">About</a>
       </nav>
 
@@ -244,7 +273,7 @@
 
         <div class="footer-links-group">
           <div class="footer-col">
-            <h4 class="footer-col-title">Navigation</h4>
+            <h3 class="footer-col-title">Navigation</h3>
             <ul class="footer-nav-list">
               <li><a href="index.html">Home</a></li>
               <li><a href="features.html">Features</a></li>
@@ -255,7 +284,7 @@
           </div>
 
           <div class="footer-col">
-            <h4 class="footer-col-title">Official Portals</h4>
+            <h3 class="footer-col-title">Official Portals</h3>
             <ul class="footer-nav-list">
               <li><a href="https://www.bis.gov.in" target="_blank" rel="noopener noreferrer">BIS Official Portal &nearr;</a></li>
               <li><a href="https://www.services.bis.gov.in" target="_blank" rel="noopener noreferrer">BIS CARE Portal &nearr;</a></li>
@@ -264,7 +293,7 @@
           </div>
 
           <div class="footer-col">
-            <h4 class="footer-col-title">Project Info</h4>
+            <h3 class="footer-col-title">Project Info</h3>
             <ul class="footer-nav-list">
               <li><span class="footer-meta-line">PS ID: SIH26107</span></li>
               <li><span class="footer-meta-line">Smart India Hackathon 2026</span></li>
