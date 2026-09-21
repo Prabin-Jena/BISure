@@ -5,6 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>BISure — Indian Standards &amp; Regulatory Assistant</title>
   <link rel="stylesheet" href="style.css" />
+  <script>
+    // Blocking theme init — must run before first paint to prevent flash-of-wrong-theme.
+    (function () {
+      var theme = "dark";
+      try {
+        var params = new URLSearchParams(window.location.search);
+        var q = params.get("theme");
+        if (q === "light" || q === "dark") theme = q;
+      } catch (e) {}
+
+      if (theme === "dark") {
+        try {
+          if (window.name && window.name.indexOf("bisure_theme:") !== -1) {
+            var m = window.name.match(/bisure_theme:(light|dark)/);
+            if (m) theme = m[1];
+          }
+        } catch (e) {}
+      }
+
+      if (theme === "dark") {
+        try {
+          var s = localStorage.getItem("bisure-theme");
+          if (s === "light" || s === "dark") theme = s;
+        } catch (e) {}
+      }
+
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
 </head>
 <body>
   <!-- Accessible Skip-to-Content Link -->
@@ -30,7 +59,7 @@
         <a href="index.html" class="nav-link nav-active" aria-current="page">Home</a>
         <a href="features.html" class="nav-link">Features</a>
         <a href="how-it-works.html" class="nav-link">How It Works</a>
-        <a href="chat.html" class="nav-link nav-link-highlight">Assistant</a>
+        <a href="chat.html" class="nav-link">Assistant</a>
         <a href="about.html" class="nav-link">About</a>
       </nav>
 
@@ -279,7 +308,7 @@
             <div class="vector-connector-line"></div>
             <div class="vector-engine-card">
               <div>ChromaDB Semantic Filter</div>
-              <div style="font-size: 0.65rem; color: var(--color-text-muted); margin-top: 2px;">k=4-6 Cosine Search</div>
+              <div style="font-size: var(--font-size-xs); color: var(--color-text-muted); margin-top: 2px;">k=4-6 Cosine Search</div>
             </div>
             <div class="vector-connector-line"></div>
           </div>
@@ -367,6 +396,12 @@
               <p class="branch-clause-text">
                 Issued under Section 14 of the BIS Act, 2016. Mandates compulsory hallmarking of gold jewellery in notified districts across India.
               </p>
+              <span class="branch-action-prompt" aria-hidden="true">
+                <span>Click to isolate</span>
+                <svg class="branch-action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </span>
             </div>
 
             <div class="evidence-branch-card" data-branch="2" tabindex="0" role="button" aria-pressed="false" aria-label="Evidence Branch 2: Technical Specification IS 1417">
@@ -375,6 +410,12 @@
               <p class="branch-clause-text">
                 Clause 4.2 formally specifies the three mandatory stamp marks: the BIS triangular mark, the fineness/caratage grade, and the HUID code.
               </p>
+              <span class="branch-action-prompt" aria-hidden="true">
+                <span>Click to isolate</span>
+                <svg class="branch-action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </span>
             </div>
 
             <div class="evidence-branch-card" data-branch="3" tabindex="0" role="button" aria-pressed="false" aria-label="Evidence Branch 3: Traceability Rule BIS Directive">
@@ -383,11 +424,16 @@
               <p class="branch-clause-text">
                 Prohibits the sale of hallmarked gold without HUID and establishes the consumer verification protocol via the official BIS CARE registry.
               </p>
+              <span class="branch-action-prompt" aria-hidden="true">
+                <span>Click to isolate</span>
+                <svg class="branch-action-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </span>
             </div>
           </div>
 
           <div class="evidence-graph-hint" aria-hidden="true">
-            <span class="hint-dot">&bull;</span>
             <span>Hover, focus, or tap any branch card to isolate its evidentiary connection</span>
           </div>
         </div>
@@ -550,7 +596,7 @@
           </div>
 
           <div class="trace-actions">
-            <button type="button" class="btn btn-secondary btn-trace-replay" id="btn-replay-trace" aria-label="Step through simulated pipeline verification">
+            <button type="button" class="btn btn-primary btn-trace-replay" id="btn-replay-trace" aria-label="Step through simulated pipeline verification">
               <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <polygon points="5 3 19 12 5 21 5 3"></polygon>
               </svg>
@@ -665,7 +711,7 @@
 
         <div class="footer-links-group">
           <div class="footer-col">
-            <h4 class="footer-col-title">Navigation</h4>
+            <h3 class="footer-col-title">Navigation</h3>
             <ul class="footer-nav-list">
               <li><a href="index.html">Home</a></li>
               <li><a href="features.html">Features</a></li>
@@ -676,7 +722,7 @@
           </div>
 
           <div class="footer-col">
-            <h4 class="footer-col-title">Official Portals</h4>
+            <h3 class="footer-col-title">Official Portals</h3>
             <ul class="footer-nav-list">
               <li><a href="https://www.bis.gov.in" target="_blank" rel="noopener noreferrer">BIS Official Portal &nearr;</a></li>
               <li><a href="https://www.services.bis.gov.in" target="_blank" rel="noopener noreferrer">BIS CARE Portal &nearr;</a></li>
@@ -685,7 +731,7 @@
           </div>
 
           <div class="footer-col">
-            <h4 class="footer-col-title">Project Info</h4>
+            <h3 class="footer-col-title">Project Info</h3>
             <ul class="footer-nav-list">
               <li><span class="footer-meta-line">PS ID: SIH26107</span></li>
               <li><span class="footer-meta-line">Smart India Hackathon 2026</span></li>
