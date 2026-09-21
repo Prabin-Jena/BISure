@@ -1,4 +1,4 @@
-// chat.js — Dedicated Chat Engine for BISure (chat.html)
+// chat.js â€” Dedicated Chat Engine for BISure (chat.html)
 // Handles RAG conversation state, streaming responses, evidence rendering, error recovery, and URL prompt prefilling.
 
 // --- DOM References (dynamically bound via initChat) ---
@@ -21,6 +21,13 @@ let isNavigatingAway = false;
 
 // Only stores confirmed turns: [{ role: "user" | "assistant", content: string }]
 const conversationHistory = [];
+
+// --- Persisted Visible Chat Log ---
+// Mirrors every rendered message into sessionStorage ("bisChatHistory") so the
+// visible conversation survives navigation to other panels and back. A full tab
+// close clears sessionStorage naturally, so no extra teardown is required here.
+const PERSISTED_SESSION_KEY = "bisChatHistory";
+const persistedMessages = [];
 
 // --- Cold Start UI Management ---
 function setColdStartNotice(visible) {
@@ -327,6 +334,14 @@ function renderSources(container, sources) {
     card.className = "evidence-card";
     card.dataset.citationIndex = String(idx + 1);
 
+    if (src.anchor_id && typeof src.anchor_id === "string" && src.anchor_id.trim()) {
+      const safeAnchor = src.anchor_id.trim();
+      card.dataset.anchorId = safeAnchor;
+      if (!document.getElementById(safeAnchor)) {
+        card.id = safeAnchor;
+      }
+    }
+
     const cardHeader = document.createElement("div");
     cardHeader.className = "evidence-card-header";
 
@@ -343,16 +358,72 @@ function renderSources(container, sources) {
 
     const docTitle = document.createElement("div");
     docTitle.className = "evidence-doc-title";
+    docTitle.spellcheck = false;
     docTitle.textContent = src.title || "Indian Standard Specification";
 
     card.appendChild(cardHeader);
     card.appendChild(docTitle);
 
-    if (src.snippet && src.snippet.trim()) {
+    let breadcrumbText = "";
+    if (Array.isArray(src.section_path)) {
+      const validSegments = src.section_path
+        .map((seg) => (typeof seg === "string" ? seg.trim() : String(seg || "").trim()))
+        .filter(Boolean);
+      if (validSegments.length > 0) {
+        breadcrumbText = validSegments.join(" \u203A ");
+      }
+    } else if (typeof src.section_path === "string" && src.section_path.trim()) {
+      breadcrumbText = src.section_path.trim();
+    }
+
+    if (breadcrumbText) {
+      const breadcrumb = document.createElement("div");
+      breadcrumb.className = "evidence-breadcrumb";
+      breadcrumb.textContent = breadcrumbText;
+      card.appendChild(breadcrumb);
+    }
+
+    const hasSnippet = Boolean(src.snippet && src.snippet.trim());
+    if (hasSnippet) {
       const snippet = document.createElement("div");
       snippet.className = "evidence-snippet";
       snippet.textContent = src.snippet.trim();
       card.appendChild(snippet);
+    }
+
+    const startLine = Number(src.start_line);
+    const endLine = Number(src.end_line);
+    const hasLineRange =
+      src.start_line != null &&
+      src.end_line != null &&
+      !isNaN(startLine) &&
+      !isNaN(endLine) &&
+      startLine > 0 &&
+      endLine > 0;
+
+    const rawHeading =
+      src.section_heading != null ? String(src.section_heading).trim() : "";
+    const hasHeading = rawHeading.length > 0;
+
+    if (hasHeading || (hasLineRange && hasSnippet)) {
+      const lineRange = document.createElement("small");
+      lineRange.className = "source-line-range";
+
+      if (hasHeading && hasLineRange) {
+        const prefix = rawHeading.toLowerCase().startsWith("cited from:")
+          ? rawHeading
+          : `Cited from: ${rawHeading}`;
+        lineRange.textContent = `${prefix} \u00B7 Lines ${startLine}\u2013${endLine}`;
+      } else if (hasHeading) {
+        const prefix = rawHeading.toLowerCase().startsWith("cited from:")
+          ? rawHeading
+          : `Cited from: ${rawHeading}`;
+        lineRange.textContent = prefix;
+      } else {
+        lineRange.textContent = `Lines ${startLine}\u2013${endLine}`;
+      }
+
+      card.appendChild(lineRange);
     }
 
     cardList.appendChild(card);
@@ -597,6 +668,20 @@ function appendMessage(role, textContent, sources = []) {
 
   messageList.appendChild(wrapper);
   scrollToBottom();
+
+  // Persist a plain-object copy of this message alongside the existing append
+  // logic (no change to rendering/styling). Restored on the next step.
+  try {
+    persistedMessages.push({
+      role,
+      content: textContent,
+      sources: Array.isArray(sources) ? sources.slice() : [],
+    });
+    sessionStorage.setItem(PERSISTED_SESSION_KEY, JSON.stringify(persistedMessages));
+  } catch (persistErr) {
+    console.warn("BISure: could not persist chat message to sessionStorage:", persistErr);
+  }
+
   return wrapper;
 }
 
@@ -949,6 +1034,15 @@ function resetConversation() {
 
   conversationHistory.length = 0;
 
+  // Clear the persisted visible log so "New Chat" truly resets and does not
+  // re-appear if the user navigates away from and back to the assistant page.
+  persistedMessages.length = 0;
+  try {
+    sessionStorage.removeItem(PERSISTED_SESSION_KEY);
+  } catch (clearErr) {
+    console.warn("BISure: could not clear persisted chat log:", clearErr);
+  }
+
   if (messageList) {
     const messages = messageList.querySelectorAll(".message, .error-banner, .retry-banner");
     messages.forEach((msg) => msg.remove());
@@ -981,6 +1075,38 @@ function handleUrlPromptParam() {
   }
 }
 
+// --- Restore Persisted Conversation (survives cross-panel navigation) ---
+function restoreConversation() {
+  // Skip if there are no render targets, or if messages are already present
+  // (keeps this idempotent if initChat runs more than once on the same page).
+  if (!messageList || messageList.querySelector(".message")) return;
+
+  let saved;
+  try {
+    saved = JSON.parse(sessionStorage.getItem(PERSISTED_SESSION_KEY) || "[]");
+  } catch (restoreErr) {
+    console.warn("BISure: failed to parse persisted chat history:", restoreErr);
+    return;
+  }
+  if (!Array.isArray(saved) || saved.length === 0) return;
+
+  // The assistant has already responded in the restored log, so the cold-start
+  // "waking up" notice should not re-appear on the next user turn.
+  hasReceivedFirstResponse = true;
+
+  // Re-render each persisted message by reusing the existing append path, so
+  // restored messages (and their evidence/copy actions) render identically.
+  // appendMessage re-pushes into persistedMessages and re-writes sessionStorage,
+  // keeping the in-memory log and the stored copy in sync.
+  for (const msg of saved) {
+    appendMessage(
+      msg.role,
+      msg.content,
+      Array.isArray(msg.sources) ? msg.sources : [],
+    );
+  }
+}
+
 // --- Lifecycle Management for Barba.js & Direct Page Load ---
 function initChat(container) {
   const root = container || document;
@@ -994,6 +1120,8 @@ function initChat(container) {
   newChatBtn = root.querySelector("#new-chat-btn") || document.getElementById("new-chat-btn");
 
   if (!chatForm && !userInput) return;
+
+  restoreConversation();
 
   if (chatForm && !chatForm.dataset.chatBound) {
     chatForm.dataset.chatBound = "true";
@@ -1084,3 +1212,4 @@ window.BISureChat = {
   showToast,
   wireCitationInteractions
 };
+
